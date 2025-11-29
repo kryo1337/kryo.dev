@@ -8,48 +8,34 @@ export interface Project {
 
 export const personalProjects: Project[] = [
   {
-    title: 'Lorem Ipsum Alpha',
-    description: 'Consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.',
-    tags: ['React', 'Node.js', 'MongoDB'],
-    image: 'https://placehold.co/600x400/1a1a1a/ffffff?text=Project+Alpha',
-    link: 'https://github.com',
+    title: 'Infinite jumps',
+    description: 'High-performance web-based FPS movement game that recreates the mechanics of source engine',
+    tags: ['React', 'Three.js', 'TS', 'HTML', 'CS'],
+    image: '/images/infinitejumps.png',
+    link: 'https://github.com/kryo1337/infinite-jumps',
   },
   {
-    title: 'Dolor Sit Amet',
-    description: 'Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.',
-    tags: ['Rust', 'WebAssembly', 'Tokio'],
-    image: 'https://placehold.co/600x400/1a1a1a/ffffff?text=Project+Beta',
-    link: 'https://github.com',
-  },
-  {
-    title: 'Consectetur Elit',
-    description: 'Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur.',
-    tags: ['Python', 'TensorFlow', 'FastAPI'],
-    image: 'https://placehold.co/600x400/1a1a1a/ffffff?text=Project+Gamma',
-    link: 'https://github.com',
+    title: 'pureReaction',
+    description: 'The ultimate web-based tool for measuring and training your reflexes with near-native speed and accuracy',
+    tags: ['Zig', 'WASM', 'HTML', 'CS', 'JS'],
+    image: '/images/purereaction.jpg',
+    link: 'https://github.com/kryo1337/pure-reaction',
   },
 ];
 
 export const wipProjects: Project[] = [
   {
-    title: 'Tempor Incididunt',
-    description: 'Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.',
-    tags: ['Next.js', 'Tailwind', 'Prisma'],
-    image: 'https://placehold.co/600x400/1a1a1a/ffffff?text=WIP+One',
-    link: 'https://github.com',
+    title: 'Valorant Discord Hub',
+    description: 'E2E Discord bot, with API and front. Faceit alike system for valorant with team selection, map bans, leaderboard, stats and more',
+    tags: ['Python', 'FastAPI', 'React', 'Tailwind CSS', 'MongoDB'],
+    image: '/images/shhh.png',
+    link: 'https://github.com/kryo1337/valodiscordhub',
   },
   {
-    title: 'Labore et Dolore',
-    description: 'Sed ut perspiciatis unde omnis iste natus error sit voluptatem accusantium doloremque laudantium.',
-    tags: ['Go', 'Docker', 'Kubernetes'],
-    image: 'https://placehold.co/600x400/1a1a1a/ffffff?text=WIP+Two',
-    link: 'https://github.com',
-  },
-  {
-    title: 'Magna Aliqua',
-    description: 'Nemo enim ipsam voluptatem quia voluptas sit aspernatur aut odit aut fugit, sed quia consequuntur.',
-    tags: ['Svelte', 'Vite', 'Firebase'],
-    image: 'https://placehold.co/600x400/1a1a1a/ffffff?text=WIP+Three',
-    link: 'https://github.com',
+    title: 'Rewiring',
+    description: 'Mobile app that helps users truly improve in any aspect',
+    tags: ['React Native', 'Expo', 'Tailwind CSS', 'Python', 'FastAPI', 'GraphQL', 'PostgreSQL'],
+    image: '/images/shhh.png',
+    link: 'https://github.com/kryo1337',
   },
 ];
