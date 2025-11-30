@@ -10,16 +10,16 @@ export const personalProjects: Project[] = [
   {
     title: 'Infinite jumps',
     description: 'High-performance web-based FPS movement game that recreates the mechanics of source engine',
-    tags: ['React', 'Three.js', 'TS', 'HTML', 'CS'],
+    tags: ['React', 'Three.js', 'TS', 'HTML', 'CSS'],
     image: '/images/infinitejumps.png',
-    link: 'https://github.com/kryo1337/infinite-jumps',
+    link: 'https://infinite-jumps.vercel.app/',
   },
   {
     title: 'pureReaction',
     description: 'The ultimate web-based tool for measuring and training your reflexes with near-native speed and accuracy',
-    tags: ['Zig', 'WASM', 'HTML', 'CS', 'JS'],
+    tags: ['Zig', 'WASM', 'HTML', 'CSS', 'JS'],
     image: '/images/purereaction.jpg',
-    link: 'https://github.com/kryo1337/pure-reaction',
+    link: 'https://pure-reaction.vercel.app/',
   },
 ];
 
@@ -29,7 +29,7 @@ export const wipProjects: Project[] = [
     description: 'E2E Discord bot, with API and front. Faceit alike system for valorant with team selection, map bans, leaderboard, stats and more',
     tags: ['Python', 'FastAPI', 'React', 'Tailwind CSS', 'MongoDB'],
     image: '/images/shhh.png',
-    link: 'https://github.com/kryo1337/valodiscordhub',
+    link: 'https://github.com/kryo1337',
   },
   {
     title: 'Rewiring',
