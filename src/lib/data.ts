@@ -8,7 +8,7 @@ export interface Project {
 
 export const personalProjects: Project[] = [
   {
-    title: 'Infinite jumps',
+    title: 'Infinite Jumps',
     description: 'High-performance web-based FPS movement game that recreates the mechanics of source engine',
     tags: ['React', 'Three.js', 'TS', 'HTML', 'CSS'],
     image: '/images/infinitejumps.png',

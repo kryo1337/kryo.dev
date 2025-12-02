@@ -6,7 +6,7 @@ import { Coffee, X, Github } from 'lucide-react';
 
 export default function Home() {
   return (
-    <main className="min-h-screen bg-neutral-950 text-neutral-100 selection:bg-purple-500/30 relative">
+    <main className="min-h-screen bg-neutral-950 text-neutral-100 selection:bg-purple-500/30 relative font-['JetBrains_Mono_Nerd','JetBrains_Mono',monospace]">
       <div className="absolute top-6 right-6 flex gap-4 z-50">
         <a
           href="https://buymeacoffee.com/kryo"
@@ -40,31 +40,34 @@ export default function Home() {
       <section className="w-full p-4 md:p-6">
         <div className="relative h-[85vh] min-h-[600px] w-full md:w-[75%] mx-auto rounded-[2.5rem] overflow-hidden flex flex-col items-center justify-center bg-neutral-900 ring-1 ring-white/5 shadow-2xl">
 
-          <div className="absolute inset-0 z-0">            <Image
-            src="/images/background.jpg"
-            alt="Background"
-            fill
-            className="object-cover"
-            priority
-          />
+          <div className="absolute inset-0 z-0">
+            <Image
+              src="/images/background.jpg"
+              alt="Background"
+              fill
+              className="object-cover"
+              priority
+              quality={90}
+              fetchPriority="high"
+              loading="eager"
+            />
             <div className="absolute inset-0 bg-black/40" />
             <div className="absolute inset-0 bg-noise mix-blend-overlay opacity-20" />
             <div className="absolute bottom-0 left-0 w-full h-1/2 bg-gradient-to-t from-black/60 to-transparent" />
           </div>
 
-          <div className="relative z-10 w-full h-[300px] mb-4 animate-in fade-in duration-1000 flex items-center justify-center">
-            <Scene />
+          <div className="absolute inset-0 z-10 flex items-start justify-center pointer-events-none pt-8">
+            <div className="w-full h-[300px] pointer-events-auto relative" style={{ zIndex: 10 }}>
+              <Scene />
+            </div>
           </div>
 
-          <div className="relative z-20 text-center space-y-6 px-4 animate-in fade-in slide-in-from-bottom-4 duration-1000 delay-300">
+          <div className="relative z-20 text-center space-y-6 px-4 mt-60">
             <div className="inline-block">
-              <h1 className="text-5xl md:text-8xl font-bold tracking-tighter text-white pb-2 drop-shadow-lg">
+              <h1 className="text-5xl md:text-8xl font-bold tracking-tighter text-white pb-2 drop-shadow-lg font-minecraft">
                 kryo
               </h1>
             </div>
-            <p className="text-lg md:text-xl text-neutral-200 font-light tracking-wide max-w-2xl mx-auto drop-shadow-md">
-              dev
-            </p>
 
             <div className="pt-8 pointer-events-auto">
               <Link
@@ -97,6 +100,7 @@ export default function Home() {
                     alt={project.title}
                     fill
                     className="object-cover group-hover:scale-105 transition-transform duration-500"
+                    loading="lazy"
                   />
                 </div>
 
@@ -115,7 +119,7 @@ export default function Home() {
                   {project.tags.map((tag) => (
                     <span
                       key={tag}
-                      className="px-3 py-1 text-xs font-medium rounded-full bg-neutral-800 text-neutral-300 border border-neutral-700 group-hover:border-neutral-600 transition-colors"
+                      className="px-3 py-1 text-xs font-medium rounded-full bg-neutral-800 text-neutral-300 border border-neutral-700 group-hover:border-neutral-600 transition-colors font-consolas"
                     >
                       {tag}
                     </span>
@@ -161,7 +165,7 @@ export default function Home() {
                   {project.tags.map((tag) => (
                     <span
                       key={tag}
-                      className="px-3 py-1 text-xs font-medium rounded-full bg-neutral-800 text-neutral-300 border border-neutral-700 group-hover:border-neutral-600 transition-colors"
+                      className="px-3 py-1 text-xs font-medium rounded-full bg-neutral-800 text-neutral-300 border border-neutral-700 group-hover:border-neutral-600 transition-colors font-consolas"
                     >
                       {tag}
                     </span>
