@@ -17,7 +17,7 @@ export const personalProjects: Project[] = [
   {
     title: 'pureReaction',
     description: 'The ultimate web-based tool for measuring and training your reflexes with near-native speed and accuracy',
-    tags: ['Zig', 'WASM', 'HTML', 'CSS', 'JS'],
+    tags: ['Zig', 'WASM', 'JS', 'HTML', 'CSS'],
     image: '/images/purereaction.jpg',
     link: 'https://pure-reaction.vercel.app/',
   },
@@ -34,7 +34,7 @@ export const wipProjects: Project[] = [
   {
     title: 'Rewiring',
     description: 'Mobile app that helps users truly improve in any aspect',
-    tags: ['React Native', 'Expo', 'Tailwind CSS', 'Python', 'FastAPI', 'GraphQL', 'PostgreSQL'],
+    tags: ['React Native', 'Expo', 'Python', 'FastAPI', 'GraphQL', 'Tailwind CSS', 'PostgreSQL'],
     image: '/images/shhh.png',
     link: 'https://github.com/kryo1337',
   },

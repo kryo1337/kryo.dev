@@ -6,13 +6,13 @@ import { Coffee, X, Github } from 'lucide-react';
 
 export default function Home() {
   return (
-    <main className="min-h-screen bg-neutral-950 text-neutral-100 selection:bg-purple-500/30 relative font-['JetBrains_Mono_Nerd','JetBrains_Mono',monospace]">
+    <main className="min-h-screen bg-neutral-950 text-neutral-100 selection:bg-mauve/30 relative font-space">
       <div className="absolute top-6 right-6 flex gap-4 z-50">
         <a
           href="https://buymeacoffee.com/kryo"
           target="_blank"
           rel="noopener noreferrer"
-          className="text-neutral-400 hover:text-white transition-all hover:scale-110 duration-200"
+          className="text-neutral-400 hover:text-mauve transition-all hover:scale-110 duration-200"
           aria-label="Buy Me a Coffee"
         >
           <Coffee size={24} />
@@ -21,7 +21,7 @@ export default function Home() {
           href="https://x.com/kryoxd"
           target="_blank"
           rel="noopener noreferrer"
-          className="text-neutral-400 hover:text-white transition-all hover:scale-110 duration-200"
+          className="text-neutral-400 hover:text-mauve transition-all hover:scale-110 duration-200"
           aria-label="Twitter"
         >
           <X size={24} />
@@ -30,7 +30,7 @@ export default function Home() {
           href="https://github.com/kryo1337"
           target="_blank"
           rel="noopener noreferrer"
-          className="text-neutral-400 hover:text-white transition-all hover:scale-110 duration-200"
+          className="text-neutral-400 hover:text-mauve transition-all hover:scale-110 duration-200"
           aria-label="GitHub"
         >
           <Github size={24} />
@@ -92,9 +92,9 @@ export default function Home() {
                 href={project.link}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="group flex flex-col h-full p-6 rounded-2xl bg-neutral-900/50 border border-neutral-800 hover:border-purple-500/50 hover:bg-neutral-900 hover:shadow-2xl hover:shadow-purple-500/10 transition-all duration-300"
+                className="group flex flex-col h-full p-6 rounded-2xl bg-neutral-900/50 border border-neutral-800 hover:border-mauve hover:ring-1 hover:ring-mauve hover:bg-neutral-900 hover:shadow-2xl hover:shadow-mauve/10 transition-all duration-300"
               >
-                <div className="relative w-full aspect-[570/438] mb-6 overflow-hidden rounded-lg bg-neutral-800">
+                <div className="relative w-full aspect-[2.5/1] mb-6 overflow-hidden rounded-lg bg-neutral-800">
                   <Image
                     src={project.image}
                     alt={project.title}
@@ -106,11 +106,11 @@ export default function Home() {
 
                 <div className="flex-1 space-y-4">
                   <div className="flex justify-between items-start">
-                    <h3 className="text-xl font-semibold group-hover:text-purple-400 transition-colors">
+                    <h3 className="text-xl font-semibold group-hover:text-mauve transition-colors">
                       {project.title}
                     </h3>
                   </div>
-                  <p className="text-sm text-neutral-400 line-clamp-3 leading-relaxed">
+                  <p className="text-sm text-neutral-400 line-clamp-3 leading-relaxed font-space">
                     {project.description}
                   </p>
                 </div>
@@ -119,7 +119,7 @@ export default function Home() {
                   {project.tags.map((tag) => (
                     <span
                       key={tag}
-                      className="px-3 py-1 text-xs font-medium rounded-full bg-neutral-800 text-neutral-300 border border-neutral-700 group-hover:border-neutral-600 transition-colors font-consolas"
+                      className="px-3 py-1 text-xs font-medium rounded-full bg-neutral-800 text-neutral-300 border border-neutral-700 group-hover:border-neutral-600 transition-colors font-mono"
                     >
                       {tag}
                     </span>
@@ -131,7 +131,7 @@ export default function Home() {
         </div>
 
         <div>
-          <h2 className="text-2xl md:text-3xl font-bold mb-8 text-white">Work In Progress</h2>
+          <h2 className="text-2xl md:text-3xl font-bold mb-8 text-white">Projects in Progress</h2>
           <div className={`grid grid-cols-1 md:grid-cols-2 gap-6 ${wipProjects.length >= 3 ? 'lg:grid-cols-3' : 'lg:grid-cols-2'}`}>
             {wipProjects.map((project, idx) => (
               <a
@@ -139,9 +139,9 @@ export default function Home() {
                 href={project.link}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="group flex flex-col h-full p-6 rounded-2xl bg-neutral-900/50 border border-neutral-800 hover:border-purple-500/50 hover:bg-neutral-900 hover:shadow-2xl hover:shadow-purple-500/10 transition-all duration-300"
+                className="group flex flex-col h-full p-6 rounded-2xl bg-neutral-900/50 border border-neutral-800 hover:border-mauve hover:ring-1 hover:ring-mauve hover:bg-neutral-900 hover:shadow-2xl hover:shadow-mauve/10 transition-all duration-300"
               >
-                <div className="relative w-full aspect-[570/438] mb-6 overflow-hidden rounded-lg bg-neutral-800 opacity-80 group-hover:opacity-100 transition-opacity">
+                <div className="relative w-full aspect-[2.5/1] mb-6 overflow-hidden rounded-lg bg-neutral-800 opacity-80 group-hover:opacity-100 transition-opacity">
                   <Image
                     src={project.image}
                     alt={project.title}
@@ -152,11 +152,11 @@ export default function Home() {
 
                 <div className="flex-1 space-y-4">
                   <div className="flex justify-between items-start">
-                    <h3 className="text-xl font-semibold group-hover:text-purple-400 transition-colors">
+                    <h3 className="text-xl font-semibold group-hover:text-mauve transition-colors">
                       {project.title}
                     </h3>
                   </div>
-                  <p className="text-sm text-neutral-400 line-clamp-3 leading-relaxed">
+                  <p className="text-sm text-neutral-400 line-clamp-3 leading-relaxed font-space">
                     {project.description}
                   </p>
                 </div>
@@ -165,7 +165,7 @@ export default function Home() {
                   {project.tags.map((tag) => (
                     <span
                       key={tag}
-                      className="px-3 py-1 text-xs font-medium rounded-full bg-neutral-800 text-neutral-300 border border-neutral-700 group-hover:border-neutral-600 transition-colors font-consolas"
+                      className="px-3 py-1 text-xs font-medium rounded-full bg-neutral-800 text-neutral-300 border border-neutral-700 group-hover:border-neutral-600 transition-colors font-mono"
                     >
                       {tag}
                     </span>

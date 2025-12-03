@@ -2,7 +2,7 @@
 
 import { Canvas, useFrame } from '@react-three/fiber';
 import { useGLTF, Environment, Center, Resize, OrbitControls } from '@react-three/drei';
-import { useMemo, useRef } from 'react';
+import { useMemo, useRef, useState } from 'react';
 import { Mesh, DoubleSide, Group } from 'three';
 
 useGLTF.preload('/models/skull.glb');
@@ -38,11 +38,11 @@ function Skull() {
   );
 }
 
-function RotatingGroup({ children }: { children: React.ReactNode }) {
+function RotatingGroup({ children, isRotating }: { children: React.ReactNode; isRotating: boolean }) {
   const groupRef = useRef<Group>(null);
 
   useFrame((state, delta) => {
-    if (groupRef.current) {
+    if (groupRef.current && isRotating) {
       groupRef.current.rotation.z += delta * 1;
       if (groupRef.current.rotation.z > Math.PI * 2) {
         groupRef.current.rotation.z -= Math.PI * 2;
@@ -58,6 +58,8 @@ function RotatingGroup({ children }: { children: React.ReactNode }) {
 }
 
 export default function Scene() {
+  const [isRotating, setIsRotating] = useState(true);
+
   return (
     <div className="w-full h-full relative" style={{ minHeight: '300px' }}>
       <Canvas 
@@ -77,7 +79,7 @@ export default function Scene() {
         <directionalLight position={[10, 10, 5]} intensity={2} />
         <ambientLight intensity={1} />
 
-        <RotatingGroup>
+        <RotatingGroup isRotating={isRotating}>
           <Center>
             <Skull />
           </Center>
@@ -87,6 +89,8 @@ export default function Scene() {
         <OrbitControls
           enableZoom={false}
           enablePan={false}
+          onStart={() => setIsRotating(false)}
+          onEnd={() => setIsRotating(true)}
         />
       </Canvas>
     </div>

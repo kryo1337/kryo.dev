@@ -1,4 +1,5 @@
 @import url('https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&display=swap');
 @import "tailwindcss";
 @plugin "@tailwindcss/typography";
 @plugin "tailwindcss-animate";
@@ -11,6 +12,9 @@
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
+  --color-mauve: #E0B0FF;
+  --color-mauve-dim: #B388FF;
+  --color-mauve-dark: #9D4EDD;
   --font-sans: var(--font-geist-sans);
   --font-mono: var(--font-geist-mono);
 }
@@ -23,7 +27,7 @@
 }
 
 * {
-  font-family: "JetBrains Mono Nerd", "JetBrains Mono", monospace;
+  font-family: "Space Grotesk", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
 }
 
 body {
@@ -49,4 +53,12 @@ body {
 .font-consolas {
   font-family: Consolas, monospace !important;
   font-size: 0.8rem !important;
+}
+
+.font-space {
+  font-family: "Space Grotesk", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif !important;
+}
+
+.font-mono {
+  font-family: "JetBrains Mono Nerd", "JetBrains Mono", monospace !important;
 }
