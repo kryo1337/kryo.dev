@@ -92,7 +92,7 @@ export default function Home() {
                 href={project.link}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="group flex flex-col h-full p-6 rounded-2xl bg-neutral-900/50 border border-neutral-800 hover:border-mauve hover:ring-1 hover:ring-mauve hover:bg-neutral-900 hover:shadow-2xl hover:shadow-mauve/10 transition-all duration-300"
+                className="group flex flex-col h-full p-6 rounded-2xl bg-neutral-900/50 border border-neutral-800 hover:border-mauve hover:bg-neutral-900 hover:shadow-2xl hover:shadow-mauve/10 transition-all duration-300"
               >
                 <div className="relative w-full aspect-[2.5/1] mb-6 overflow-hidden rounded-lg bg-neutral-800">
                   <Image
@@ -139,7 +139,7 @@ export default function Home() {
                 href={project.link}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="group flex flex-col h-full p-6 rounded-2xl bg-neutral-900/50 border border-neutral-800 hover:border-mauve hover:ring-1 hover:ring-mauve hover:bg-neutral-900 hover:shadow-2xl hover:shadow-mauve/10 transition-all duration-300"
+                className="group flex flex-col h-full p-6 rounded-2xl bg-neutral-900/50 border border-neutral-800 hover:border-mauve hover:bg-neutral-900 hover:shadow-2xl hover:shadow-mauve/10 transition-all duration-300"
               >
                 <div className="relative w-full aspect-[2.5/1] mb-6 overflow-hidden rounded-lg bg-neutral-800 opacity-80 group-hover:opacity-100 transition-opacity">
                   <Image
