@@ -38,10 +38,16 @@ function Skull() {
   );
 }
 
-function RotatingGroup({ children, isRotating }: { children: React.ReactNode; isRotating: boolean }) {
+function RotatingGroup({ children, isRotating, onReady }: { children: React.ReactNode; isRotating: boolean; onReady?: () => void }) {
   const groupRef = useRef<Group>(null);
+  const readyRef = useRef(false);
 
   useFrame((state, delta) => {
+    if (!readyRef.current && onReady) {
+      readyRef.current = true;
+      onReady();
+    }
+
     if (groupRef.current && isRotating) {
       groupRef.current.rotation.z += delta * 1;
       if (groupRef.current.rotation.z > Math.PI * 2) {
@@ -57,16 +63,16 @@ function RotatingGroup({ children, isRotating }: { children: React.ReactNode; is
   );
 }
 
-export default function Scene() {
+export default function Scene({ onReady }: { onReady?: () => void }) {
   const [isRotating, setIsRotating] = useState(true);
 
   return (
     <div className="w-full h-full relative" style={{ minHeight: '300px' }}>
-      <Canvas 
-        style={{ background: 'transparent' }} 
+      <Canvas
+        style={{ background: 'transparent' }}
         camera={{ position: [0, 0, 5], fov: 30, near: 0.1, far: 100 }}
-        gl={{ 
-          preserveDrawingBuffer: true, 
+        gl={{
+          preserveDrawingBuffer: true,
           alpha: true,
           powerPreference: 'high-performance',
           antialias: true,
@@ -79,7 +85,7 @@ export default function Scene() {
         <directionalLight position={[10, 10, 5]} intensity={2} />
         <ambientLight intensity={1} />
 
-        <RotatingGroup isRotating={isRotating}>
+        <RotatingGroup isRotating={isRotating} onReady={onReady}>
           <Center>
             <Skull />
           </Center>
