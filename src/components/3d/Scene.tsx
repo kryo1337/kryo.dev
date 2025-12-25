@@ -1,13 +1,13 @@
 'use client';
 
-import { Canvas, useFrame } from '@react-three/fiber';
+import { Canvas, useFrame, useThree } from '@react-three/fiber';
 import { useGLTF, Environment, Center, Resize, OrbitControls } from '@react-three/drei';
 import { useMemo, useRef, useState } from 'react';
-import { Mesh, DoubleSide, Group } from 'three';
+import { Mesh, DoubleSide, Group, Vector3 } from 'three';
 
 useGLTF.preload('/models/skull.glb');
 
-function Skull() {
+function Skull({ color }: { color: string }) {
   const { nodes } = useGLTF('/models/skull.glb');
 
   const geometry = useMemo(() => {
@@ -26,7 +26,7 @@ function Skull() {
           )}
 
           <meshStandardMaterial
-            color="#E0B0FF"
+            color={color}
             metalness={1}
             roughness={0.2}
             envMapIntensity={1}
@@ -36,6 +36,22 @@ function Skull() {
       </Resize>
     </group>
   );
+}
+
+function CameraReset({ isRotating }: { isRotating: boolean }) {
+  const { camera } = useThree();
+  const target = useMemo(() => new Vector3(0, 0, 5), []);
+
+  useFrame((state, delta) => {
+    if (isRotating) {
+      if (camera.position.distanceTo(target) > 0.01) {
+        state.camera.position.lerp(target, 4 * delta);
+        state.camera.position.setLength(5);
+        state.camera.lookAt(0, 0, 0);
+      }
+    }
+  });
+  return null;
 }
 
 function RotatingGroup({ children, isRotating, onReady }: { children: React.ReactNode; isRotating: boolean; onReady?: () => void }) {
@@ -63,7 +79,7 @@ function RotatingGroup({ children, isRotating, onReady }: { children: React.Reac
   );
 }
 
-export default function Scene({ onReady }: { onReady?: () => void }) {
+export default function Scene({ onReady, skullColor = '#E0B0FF' }: { onReady?: () => void; skullColor?: string }) {
   const [isRotating, setIsRotating] = useState(true);
 
   return (
@@ -85,9 +101,11 @@ export default function Scene({ onReady }: { onReady?: () => void }) {
         <directionalLight position={[10, 10, 5]} intensity={2} />
         <ambientLight intensity={1} />
 
+        <CameraReset isRotating={isRotating} />
+
         <RotatingGroup isRotating={isRotating} onReady={onReady}>
           <Center>
-            <Skull />
+            <Skull color={skullColor} />
           </Center>
         </RotatingGroup>
 
