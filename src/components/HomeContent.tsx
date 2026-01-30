@@ -211,7 +211,7 @@ export default function HomeContent() {
       </section>
 
       <footer className="py-12 text-center text-muted text-xs">
-        <p>&copy; 2025 kryo.dev</p>
+        <p>&copy; 2026 kryo.dev</p>
       </footer>
     </main>
   );

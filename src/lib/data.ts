@@ -21,6 +21,13 @@ export const personalProjects: Project[] = [
     image: '/images/purereaction.png',
     link: 'https://pure-reaction.vercel.app/',
   },
+  {
+    title: 'GETRANK',
+    description: 'Fast Valorant player lookup via leaderboard rank or Riot ID',
+    tags: ['React', 'TS', 'Tailwind CSS', 'Redis', 'Puppeteer', 'Bun'],
+    image: '/images/getrank.png',
+    link: 'https://getrank.vercel.app/',
+  },
 ];
 
 export const wipProjects: Project[] = [
