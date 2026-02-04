@@ -32,6 +32,14 @@ export const personalProjects: Project[] = [
     link: 'https://getrank.vercel.app/',
     isOpenSource: true,
   },
+  {
+    title: 'YTVOD Pipeline',
+    description: 'Automated Valorant VOD pipeline that scrapes pro matches, downloads VODs, processes footage, generates thumbnails, and uploads to YouTube with Telegram notifications',
+    tags: ['Python', 'OpenCV', 'YouTube API', 'Twitch API', 'SOOP API', 'Telegram API', 'FFmpeg', 'yt-dlp'],
+    image: '/images/ytvod.png',
+    link: 'https://www.youtube.com/@ValoBengBeng',
+    isOpenSource: false,
+  },
 ];
 
 export const wipProjects: Project[] = [
