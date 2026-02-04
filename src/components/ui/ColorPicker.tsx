@@ -4,8 +4,15 @@ import { useState, useEffect, useRef, useCallback } from 'react';
 import { Palette, RefreshCw } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 
-const DEFAULT_COLOR = '#E0B0FF';
+const DEFAULT_COLOR = '#C80050';
 const DEBOUNCE_DELAY = 300;
+const STORAGE_KEY = 'kryo-accent-color';
+
+function getInitialColor() {
+  if (typeof window === 'undefined') return DEFAULT_COLOR;
+  const saved = localStorage.getItem(STORAGE_KEY);
+  return (saved && /^#[0-9A-F]{6}$/i.test(saved)) ? saved : DEFAULT_COLOR;
+}
 
 function hexToRgb(hex: string) {
   const result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
@@ -15,7 +22,7 @@ function hexToRgb(hex: string) {
         g: parseInt(result[2], 16),
         b: parseInt(result[3], 16),
       }
-    : { r: 224, g: 176, b: 255 };
+    : { r: 200, g: 0, b: 80 };
 }
 
 function rgbToHex(r: number, g: number, b: number) {
@@ -31,10 +38,11 @@ function adjustBrightness(r: number, g: number, b: number, factor: number) {
 
 export default function ColorPicker({ onColorChange }: { onColorChange?: (hex: string) => void }) {
   const [isOpen, setIsOpen] = useState(false);
-  const [rgb, setRgb] = useState({ r: 224, g: 176, b: 255 });
-  const [hexInput, setHexInput] = useState(DEFAULT_COLOR);
+  const [rgb, setRgb] = useState(() => hexToRgb(getInitialColor()));
+  const [hexInput, setHexInput] = useState(() => getInitialColor());
   const panelRef = useRef<HTMLDivElement>(null);
   const timerRef = useRef<NodeJS.Timeout | null>(null);
+  const hasInitialized = useRef(false);
 
   const isValidHex = /^#[0-9A-F]{6}$/i.test(hexInput);
 
@@ -46,22 +54,20 @@ export default function ColorPicker({ onColorChange }: { onColorChange?: (hex: s
     document.documentElement.style.setProperty('--color-mauve', hex);
     document.documentElement.style.setProperty('--color-mauve-dim', dimHex);
     document.documentElement.style.setProperty('--color-mauve-dark', darkHex);
-    
+
     if (onColorChange) {
       onColorChange(hex);
     }
   }, [onColorChange]);
 
+  /* eslint-disable react-hooks/exhaustive-deps */
   useEffect(() => {
-    const savedColor = localStorage.getItem('kryo-accent-color');
-    if (savedColor && /^#[0-9A-F]{6}$/i.test(savedColor)) {
-      const parsedRgb = hexToRgb(savedColor);
-      // eslint-disable-next-line
-      setRgb(parsedRgb);
-      setHexInput(savedColor);
-      applyColor(parsedRgb.r, parsedRgb.g, parsedRgb.b);
+    if (!hasInitialized.current) {
+      hasInitialized.current = true;
+      applyColor(rgb.r, rgb.g, rgb.b);
     }
-  }, [applyColor]);
+  }, []);
+  /* eslint-enable react-hooks/exhaustive-deps */
 
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
@@ -100,7 +106,7 @@ export default function ColorPicker({ onColorChange }: { onColorChange?: (hex: s
 
     if (timerRef.current) clearTimeout(timerRef.current);
     timerRef.current = setTimeout(() => {
-      localStorage.setItem('kryo-accent-color', newHex);
+      localStorage.setItem(STORAGE_KEY, newHex);
     }, DEBOUNCE_DELAY);
   };
 
@@ -109,7 +115,7 @@ export default function ColorPicker({ onColorChange }: { onColorChange?: (hex: s
       const newRgb = hexToRgb(hexInput);
       setRgb(newRgb);
       applyColor(newRgb.r, newRgb.g, newRgb.b);
-      localStorage.setItem('kryo-accent-color', hexInput);
+      localStorage.setItem(STORAGE_KEY, hexInput);
     }
   };
 
@@ -118,7 +124,7 @@ export default function ColorPicker({ onColorChange }: { onColorChange?: (hex: s
     setRgb(defaultRgb);
     setHexInput(DEFAULT_COLOR);
     applyColor(defaultRgb.r, defaultRgb.g, defaultRgb.b);
-    localStorage.removeItem('kryo-accent-color');
+    localStorage.removeItem(STORAGE_KEY);
   };
 
   return (
@@ -127,8 +133,8 @@ export default function ColorPicker({ onColorChange }: { onColorChange?: (hex: s
         onClick={() => setIsOpen(!isOpen)}
         className="flex items-center gap-2 text-muted hover:text-mauve transition-colors duration-200"
       >
-        <Palette size={20} />
-        <span className="text-xs font-medium tracking-wide">COLOR PICKER</span>
+        <Palette size={20} className="w-5 h-5" />
+        <span className="text-xs font-medium tracking-wide hidden sm:inline">COLOR PICKER</span>
       </button>
 
       <AnimatePresence>
@@ -138,19 +144,19 @@ export default function ColorPicker({ onColorChange }: { onColorChange?: (hex: s
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -10 }}
             transition={{ duration: 0.15 }}
-            className="absolute top-full left-0 mt-4 p-5 bg-bg-elevated-2 border border-border-subtle rounded-xl shadow-xl w-72 z-50 flex flex-col gap-4"
+            className="absolute top-full left-0 right-0 sm:right-auto sm:left-0 mt-3 sm:mt-4 p-4 sm:p-5 bg-bg-elevated-2 border border-border-subtle rounded-xl shadow-xl w-[calc(100vw-2rem)] sm:w-72 z-50 flex flex-col gap-3 sm:gap-4"
           >
-            <div className="flex items-center justify-between mb-2">
+            <div className="flex items-center justify-between mb-1 sm:mb-2">
                <span className="text-xs font-semibold text-muted uppercase tracking-wider">Edit Color</span>
-               <div 
-                 className="w-8 h-8 rounded-md border border-border-subtle shadow-sm transition-colors duration-200"
+               <div
+                 className="w-6 h-6 sm:w-8 sm:h-8 rounded-md border border-border-subtle shadow-sm transition-colors duration-200"
                  style={{ backgroundColor: `rgb(${rgb.r}, ${rgb.g}, ${rgb.b})` }}
                />
             </div>
 
-            <div className="space-y-3">
-              <div className="flex items-center gap-3">
-                <span className="text-xs text-muted font-mono w-3">R</span>
+            <div className="space-y-2 sm:space-y-3">
+              <div className="flex items-center gap-2 sm:gap-3">
+                <span className="text-[10px] sm:text-xs text-muted font-mono w-3">R</span>
                 <input
                   type="range"
                   min="0"
@@ -160,11 +166,11 @@ export default function ColorPicker({ onColorChange }: { onColorChange?: (hex: s
                   className="flex-1 h-1.5 bg-bg-elevated rounded-lg appearance-none cursor-pointer slider-red"
                   aria-label={`Red channel: ${rgb.r}`}
                 />
-                <span className="text-xs text-muted font-mono w-6 text-right">{rgb.r}</span>
+                <span className="text-[10px] sm:text-xs text-muted font-mono w-5 sm:w-6 text-right">{rgb.r}</span>
               </div>
 
-              <div className="flex items-center gap-3">
-                <span className="text-xs text-muted font-mono w-3">G</span>
+              <div className="flex items-center gap-2 sm:gap-3">
+                <span className="text-[10px] sm:text-xs text-muted font-mono w-3">G</span>
                 <input
                   type="range"
                   min="0"
@@ -174,11 +180,11 @@ export default function ColorPicker({ onColorChange }: { onColorChange?: (hex: s
                   className="flex-1 h-1.5 bg-bg-elevated rounded-lg appearance-none cursor-pointer slider-green"
                   aria-label={`Green channel: ${rgb.g}`}
                 />
-                <span className="text-xs text-muted font-mono w-6 text-right">{rgb.g}</span>
+                <span className="text-[10px] sm:text-xs text-muted font-mono w-5 sm:w-6 text-right">{rgb.g}</span>
               </div>
 
-              <div className="flex items-center gap-3">
-                <span className="text-xs text-muted font-mono w-3">B</span>
+              <div className="flex items-center gap-2 sm:gap-3">
+                <span className="text-[10px] sm:text-xs text-muted font-mono w-3">B</span>
                 <input
                   type="range"
                   min="0"
@@ -188,11 +194,11 @@ export default function ColorPicker({ onColorChange }: { onColorChange?: (hex: s
                   className="flex-1 h-1.5 bg-bg-elevated rounded-lg appearance-none cursor-pointer slider-blue"
                   aria-label={`Blue channel: ${rgb.b}`}
                 />
-                <span className="text-xs text-muted font-mono w-6 text-right">{rgb.b}</span>
+                <span className="text-[10px] sm:text-xs text-muted font-mono w-5 sm:w-6 text-right">{rgb.b}</span>
               </div>
             </div>
 
-            <div className="flex items-center gap-2 mt-2 pt-4 border-t border-border-subtle">
+            <div className="flex items-center gap-2 mt-1 sm:mt-2 pt-3 sm:pt-4 border-t border-border-subtle">
               <span className="text-xs text-muted font-mono">HEX:</span>
               <input
                 type="text"

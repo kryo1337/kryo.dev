@@ -1,46 +1,31 @@
 'use client';
 
+import { useState } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 import { personalProjects, wipProjects } from '@/lib/data';
 import Scene from '@/components/3d/Scene';
-import { Coffee, X, Github } from 'lucide-react';
-import { useAssetLoader } from '@/hooks/useAssetLoader';
-import LoadingScreen from '@/components/ui/LoadingScreen';
 import ColorPicker from '@/components/ui/ColorPicker';
-import { useMemo, useState, useCallback } from 'react';
+
+const DEFAULT_COLOR = '#C80050';
+const STORAGE_KEY = 'kryo-accent-color';
+
+function getInitialColor() {
+  if (typeof window === 'undefined') return DEFAULT_COLOR;
+  const saved = localStorage.getItem(STORAGE_KEY);
+  return (saved && /^#[0-9A-F]{6}$/i.test(saved)) ? saved : DEFAULT_COLOR;
+}
 
 export default function HomeContent() {
-  const [sceneReady, setSceneReady] = useState(false);
-  const [skullColor, setSkullColor] = useState('#E0B0FF');
-
-  const images = useMemo(() => {
-    return [
-      '/images/background.jpg',
-      ...personalProjects.map((p) => p.image),
-      ...wipProjects.map((p) => p.image),
-    ];
-  }, []);
-
-  const { progress, loaded } = useAssetLoader(images, sceneReady);
-
-  const handleSceneReady = useCallback(() => {
-    setSceneReady(true);
-  }, []);
-
-  const handleColorChange = useCallback((hex: string) => {
-    setSkullColor(hex);
-  }, []);
+  const [skullColor, setSkullColor] = useState(() => getInitialColor());
 
   return (
     <main className="min-h-screen bg-background text-foreground selection:bg-mauve-dim/30 relative font-space">
-      <LoadingScreen progress={progress} loaded={loaded} />
-
-      <div className="absolute top-6 left-6 z-50">
-        <ColorPicker onColorChange={handleColorChange} />
+      <div className="fixed top-4 left-4 md:top-6 md:left-6 z-50">
+        <ColorPicker onColorChange={(hex) => setSkullColor(hex)} />
       </div>
 
-      <div className="absolute top-6 right-6 flex gap-4 z-50">
+      <div className="fixed top-4 right-4 md:top-6 md:right-6 flex gap-3 md:gap-4 z-50">
         <a
           href="https://buymeacoffee.com/kryo"
           target="_blank"
@@ -48,16 +33,46 @@ export default function HomeContent() {
           className="text-muted hover:text-mauve transition-transform hover:scale-110 duration-200"
           aria-label="Buy Me a Coffee"
         >
-          <Coffee size={24} />
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            width="20"
+            height="20"
+            className="w-5 h-5 md:w-6 md:h-6"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="2"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+          >
+            <path d="M18 8h1a4 4 0 0 1 0 8h-1" />
+            <path d="M2 8h16v9a4 4 0 0 1-4 4H6a4 4 0 0 1-4-4V8z" />
+            <line x1="6" y1="1" x2="6" y2="4" />
+            <line x1="10" y1="1" x2="10" y2="4" />
+            <line x1="14" y1="1" x2="14" y2="4" />
+          </svg>
         </a>
         <a
           href="https://x.com/kryoxd"
           target="_blank"
           rel="noopener noreferrer"
           className="text-muted hover:text-mauve transition-transform hover:scale-110 duration-200"
-          aria-label="Twitter"
+          aria-label="X (Twitter)"
         >
-          <X size={24} />
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            width="20"
+            height="20"
+            className="w-5 h-5 md:w-6 md:h-6"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="2"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+          >
+            <path d="M4 4l11.733 16h4.267l-11.733 -16z M20 4l-11.733 16h-4.267l11.733 -16z" />
+          </svg>
         </a>
         <a
           href="https://github.com/kryo1337"
@@ -66,7 +81,20 @@ export default function HomeContent() {
           className="text-muted hover:text-mauve transition-transform hover:scale-110 duration-200"
           aria-label="GitHub"
         >
-          <Github size={24} />
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            width="20"
+            height="20"
+            className="w-5 h-5 md:w-6 md:h-6"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="2"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+          >
+            <path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 0 0-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0 0 20 4.77 5.07 5.07 0 0 0 19.91 1S18.73.65 16 2.48a13.38 13.38 0 0 0-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 0 0 5 4.77a5.44 5.44 0 0 0-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 0 0 9 18.13V22" />
+          </svg>
         </a>
       </div>
 
@@ -91,7 +119,7 @@ export default function HomeContent() {
 
           <div className="absolute inset-0 z-10 flex items-start justify-center pointer-events-none pt-8">
             <div className="w-full h-[300px] pointer-events-auto relative" style={{ zIndex: 10 }}>
-              <Scene onReady={handleSceneReady} skullColor={skullColor} />
+              <Scene skullColor={skullColor} />
             </div>
           </div>
 
@@ -127,26 +155,33 @@ export default function HomeContent() {
                 rel="noopener noreferrer"
                 className="group flex flex-col h-full p-6 rounded-2xl bg-bg-elevated-2 border border-border-subtle hover:border-mauve-dim hover:shadow-lg hover:shadow-mauve-dark/10 transition-transform duration-300"
               >
-                <div className="relative w-full aspect-[2.5/1] mb-6 overflow-hidden rounded-lg bg-bg-elevated">
-                  <Image
-                    src={project.image}
-                    alt={project.title}
-                    fill
-                    className="object-cover group-hover:scale-105 transition-transform duration-500"
-                    loading="lazy"
-                  />
-                </div>
-
-                <div className="flex-1 space-y-4">
-                  <div className="flex justify-between items-start">
-                    <h3 className="text-xl font-semibold text-mauve transition-colors">
-                      {project.title}
-                    </h3>
+                  <div className="relative w-full aspect-[2.5/1] mb-6 overflow-hidden rounded-lg bg-bg-elevated">
+                    <Image
+                      src={project.image}
+                      alt={project.title}
+                      fill
+                      className="object-cover group-hover:scale-105 transition-transform duration-500"
+                      loading="lazy"
+                    />
                   </div>
-                  <p className="text-sm text-foreground line-clamp-3 leading-relaxed font-space">
-                    {project.description}
-                  </p>
-                </div>
+
+                  <div className="flex-1 space-y-4">
+                    <div className="flex justify-between items-start">
+                      <h3 className="text-xl font-semibold text-mauve transition-colors">
+                        {project.title}
+                      </h3>
+                      <span className={`px-2 py-1 text-[10px] font-medium rounded-full font-mono ${
+                        project.isOpenSource 
+                          ? 'bg-green-500/10 text-green-400 border border-green-500/20' 
+                          : 'bg-red-500/10 text-red-400 border border-red-500/20'
+                      }`}>
+                        {project.isOpenSource ? 'open source' : 'closed source'}
+                      </span>
+                    </div>
+                    <p className="text-sm text-foreground line-clamp-3 leading-relaxed font-space">
+                      {project.description}
+                    </p>
+                  </div>
 
                 <div className="mt-6 pt-6 border-t border-border-subtle flex flex-wrap gap-2">
                   {project.tags.map((tag) => (
@@ -174,25 +209,32 @@ export default function HomeContent() {
                 rel="noopener noreferrer"
                 className="group flex flex-col h-full p-6 rounded-2xl bg-bg-elevated-2 border border-border-subtle hover:border-mauve-dim hover:shadow-lg hover:shadow-mauve-dark/10 transition-transform duration-300"
               >
-                <div className="relative w-full aspect-[2.5/1] mb-6 overflow-hidden rounded-lg bg-bg-elevated opacity-80 group-hover:opacity-100 transition-opacity">
-                  <Image
-                    src={project.image}
-                    alt={project.title}
-                    fill
-                    className="object-cover group-hover:scale-105 transition-transform duration-500 grayscale group-hover:grayscale-0"
-                  />
-                </div>
-
-                <div className="flex-1 space-y-4">
-                  <div className="flex justify-between items-start">
-                    <h3 className="text-xl font-semibold text-mauve transition-colors">
-                      {project.title}
-                    </h3>
+                  <div className="relative w-full aspect-[2.5/1] mb-6 overflow-hidden rounded-lg bg-bg-elevated opacity-80 group-hover:opacity-100 transition-opacity">
+                    <Image
+                      src={project.image}
+                      alt={project.title}
+                      fill
+                      className="object-cover group-hover:scale-105 transition-transform duration-500 grayscale group-hover:grayscale-0"
+                    />
                   </div>
-                  <p className="text-sm text-foreground line-clamp-3 leading-relaxed font-space">
-                    {project.description}
-                  </p>
-                </div>
+
+                  <div className="flex-1 space-y-4">
+                    <div className="flex justify-between items-start">
+                      <h3 className="text-xl font-semibold text-mauve transition-colors">
+                        {project.title}
+                      </h3>
+                      <span className={`px-2 py-1 text-[10px] font-medium rounded-full font-mono ${
+                        project.isOpenSource 
+                          ? 'bg-green-500/10 text-green-400 border border-green-500/20' 
+                          : 'bg-red-500/10 text-red-400 border border-red-500/20'
+                      }`}>
+                        {project.isOpenSource ? 'open source' : 'closed source'}
+                      </span>
+                    </div>
+                    <p className="text-sm text-foreground line-clamp-3 leading-relaxed font-space">
+                      {project.description}
+                    </p>
+                  </div>
 
                 <div className="mt-6 pt-6 border-t border-border-subtle flex flex-wrap gap-2">
                   {project.tags.map((tag) => (

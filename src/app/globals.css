@@ -6,17 +6,17 @@ html {
   scrollbar-gutter: stable;
 }
 
-:root {
-  --background: #111214;
-  --bg-elevated: #181a1d;
-  --bg-elevated-2: #1f2226;
-  --foreground: #d4d4d4;
-  --muted: #80868f;
-  --color-mauve: #E0B0FF;
-  --color-mauve-dim: #B388FF;
-  --color-mauve-dark: #9D4EDD;
-  --border-subtle: #26292f;
-}
+ :root {
+   --background: #111214;
+   --bg-elevated: #181a1d;
+   --bg-elevated-2: #1f2226;
+   --foreground: #d4d4d4;
+   --muted: #80868f;
+   --color-mauve: #C80050;
+   --color-mauve-dim: #A00040;
+   --color-mauve-dark: #780030;
+   --border-subtle: #26292f;
+ }
 
 @theme inline {
   --color-background: var(--background);

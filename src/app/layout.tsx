@@ -25,6 +25,14 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en" className={`${pressStart2P.variable} ${spaceGrotesk.variable}`}>
+      <head>
+        <link
+          rel="preload"
+          href="/models/skull.glb"
+          as="fetch"
+          crossOrigin="anonymous"
+        />
+      </head>
       <body className="antialiased font-space">
         {children}
       </body>
