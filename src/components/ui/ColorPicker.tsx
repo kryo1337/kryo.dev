@@ -1,8 +1,7 @@
 'use client';
 
 import { useState, useEffect, useRef, useCallback } from 'react';
-import { Palette, RefreshCw } from 'lucide-react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { motion, AnimatePresence, useReducedMotion } from 'framer-motion';
 
 const DEFAULT_COLOR = '#C80050';
 const DEBOUNCE_DELAY = 300;
@@ -43,6 +42,7 @@ export default function ColorPicker({ onColorChange }: { onColorChange?: (hex: s
   const panelRef = useRef<HTMLDivElement>(null);
   const timerRef = useRef<NodeJS.Timeout | null>(null);
   const hasInitialized = useRef(false);
+  const prefersReducedMotion = useReducedMotion();
 
   const isValidHex = /^#[0-9A-F]{6}$/i.test(hexInput);
 
@@ -128,100 +128,69 @@ export default function ColorPicker({ onColorChange }: { onColorChange?: (hex: s
   };
 
   return (
-    <div className="relative font-space" ref={panelRef}>
-      <button
-        onClick={() => setIsOpen(!isOpen)}
-        className="flex items-center gap-2 text-muted hover:text-mauve transition-colors duration-200"
-      >
-        <Palette size={20} className="w-5 h-5" />
-        <span className="text-xs font-medium tracking-wide hidden sm:inline">COLOR PICKER</span>
+    <div className="relative" ref={panelRef}>
+      <button onClick={() => setIsOpen(!isOpen)} className="link-tui">
+        [color]
       </button>
 
       <AnimatePresence>
         {isOpen && (
           <motion.div
-            initial={{ opacity: 0, y: -10 }}
+            initial={prefersReducedMotion ? false : { opacity: 0, y: -10 }}
             animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: -10 }}
-            transition={{ duration: 0.15 }}
-            className="absolute top-full left-0 right-0 sm:right-auto sm:left-0 mt-3 sm:mt-4 p-4 sm:p-5 bg-bg-elevated-2 border border-border-subtle rounded-xl shadow-xl w-[calc(100vw-2rem)] sm:w-72 z-50 flex flex-col gap-3 sm:gap-4"
+            exit={prefersReducedMotion ? undefined : { opacity: 0, y: -10 }}
+            transition={prefersReducedMotion ? { duration: 0 } : { duration: 0.15 }}
+            className="absolute top-full left-0 right-0 sm:right-auto sm:left-0 mt-3 p-4 bg-bg-elevated border border-border-subtle w-[calc(100vw-2rem)] sm:w-72 z-50 flex flex-col gap-4"
           >
-            <div className="flex items-center justify-between mb-1 sm:mb-2">
-               <span className="text-xs font-semibold text-muted uppercase tracking-wider">Edit Color</span>
-               <div
-                 className="w-6 h-6 sm:w-8 sm:h-8 rounded-md border border-border-subtle shadow-sm transition-colors duration-200"
-                 style={{ backgroundColor: `rgb(${rgb.r}, ${rgb.g}, ${rgb.b})` }}
-               />
+            <div className="flex items-center justify-between">
+              <span className="text-[30px] text-foreground">Color</span>
+              <div
+                className="w-6 h-6 border border-border-subtle transition-colors duration-200"
+                style={{ backgroundColor: `rgb(${rgb.r}, ${rgb.g}, ${rgb.b})` }}
+              />
             </div>
 
-            <div className="space-y-2 sm:space-y-3">
-              <div className="flex items-center gap-2 sm:gap-3">
-                <span className="text-[10px] sm:text-xs text-muted font-mono w-3">R</span>
-                <input
-                  type="range"
-                  min="0"
-                  max="255"
-                  value={rgb.r}
-                  onChange={(e) => handleSliderChange('r', parseInt(e.target.value))}
-                  className="flex-1 h-1.5 bg-bg-elevated rounded-lg appearance-none cursor-pointer slider-red"
-                  aria-label={`Red channel: ${rgb.r}`}
-                />
-                <span className="text-[10px] sm:text-xs text-muted font-mono w-5 sm:w-6 text-right">{rgb.r}</span>
-              </div>
-
-              <div className="flex items-center gap-2 sm:gap-3">
-                <span className="text-[10px] sm:text-xs text-muted font-mono w-3">G</span>
-                <input
-                  type="range"
-                  min="0"
-                  max="255"
-                  value={rgb.g}
-                  onChange={(e) => handleSliderChange('g', parseInt(e.target.value))}
-                  className="flex-1 h-1.5 bg-bg-elevated rounded-lg appearance-none cursor-pointer slider-green"
-                  aria-label={`Green channel: ${rgb.g}`}
-                />
-                <span className="text-[10px] sm:text-xs text-muted font-mono w-5 sm:w-6 text-right">{rgb.g}</span>
-              </div>
-
-              <div className="flex items-center gap-2 sm:gap-3">
-                <span className="text-[10px] sm:text-xs text-muted font-mono w-3">B</span>
-                <input
-                  type="range"
-                  min="0"
-                  max="255"
-                  value={rgb.b}
-                  onChange={(e) => handleSliderChange('b', parseInt(e.target.value))}
-                  className="flex-1 h-1.5 bg-bg-elevated rounded-lg appearance-none cursor-pointer slider-blue"
-                  aria-label={`Blue channel: ${rgb.b}`}
-                />
-                <span className="text-[10px] sm:text-xs text-muted font-mono w-5 sm:w-6 text-right">{rgb.b}</span>
-              </div>
+            <div className="space-y-3">
+              {(['r', 'g', 'b'] as const).map((ch) => (
+                <div key={ch} className="flex items-center gap-3">
+                  <span className="text-[20px] text-muted w-3 uppercase">{ch}</span>
+                  <input
+                    type="range"
+                    min="0"
+                    max="255"
+                    value={rgb[ch]}
+                    onChange={(e) => handleSliderChange(ch, parseInt(e.target.value))}
+                    className={`slider-tui ${ch === 'r' ? 'slider-red' : ch === 'g' ? 'slider-green' : 'slider-blue'}`}
+                    aria-label={`${ch} channel: ${rgb[ch]}`}
+                  />
+                  <span className="text-[20px] text-muted w-8 text-right">{rgb[ch]}</span>
+                </div>
+              ))}
             </div>
 
-            <div className="flex items-center gap-2 mt-1 sm:mt-2 pt-3 sm:pt-4 border-t border-border-subtle">
-              <span className="text-xs text-muted font-mono">HEX:</span>
+            <div className="flex items-center gap-2 pt-3 border-t border-border-subtle">
+              <span className="text-[20px] text-muted">hex</span>
               <input
                 type="text"
                 value={hexInput}
                 onChange={(e) => setHexInput(e.target.value)}
                 maxLength={7}
-                className={`w-full bg-bg-elevated border rounded px-2 py-1 text-xs text-foreground font-mono focus:outline-none transition-colors ${
+                className={`w-full min-w-0 bg-background border px-2 py-0.5 text-[20px] text-foreground focus:outline-none transition-colors ${
                   isValidHex ? 'border-border-subtle focus:border-mauve' : 'border-red-500 focus:border-red-500'
                 }`}
               />
+            </div>
+
+            <div className="flex gap-2">
               <button
                 onClick={handleHexSet}
                 disabled={!isValidHex}
-                className="px-3 py-1 bg-bg-elevated hover:bg-bg-elevated-2 border border-border-subtle rounded text-xs text-mauve disabled:opacity-50 disabled:cursor-not-allowed transition-colors font-medium"
+                className="btn-tui btn-tui-primary disabled:opacity-50 disabled:cursor-not-allowed"
               >
-                SET
+                Set
               </button>
-              <button
-                onClick={handleReset}
-                className="p-1 hover:text-mauve text-muted transition-colors"
-                title="Reset to default"
-              >
-                <RefreshCw size={14} />
+              <button onClick={handleReset} className="btn-tui btn-tui-secondary">
+                Reset
               </button>
             </div>
           </motion.div>

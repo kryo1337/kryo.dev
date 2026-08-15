@@ -104,7 +104,7 @@ export default function Scene({ skullColor = '#C80050' }: { skullColor?: string 
             </Center>
           </RotatingGroup>
 
-          <Environment preset="city" blur={1} />
+          <Environment files="/hdr/city.hdr" blur={1} />
           <OrbitControls
             enableZoom={false}
             enablePan={false}

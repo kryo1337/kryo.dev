@@ -1,5 +1,11 @@
 # kryo.dev
 
-> A  portfolio site.
+> Personal portfolio with a walkable minecraft world.
 
-Personal portfolio showcasing projects with a dark-themed design featuring an interactive 3D skull model and real-time color customization.
+Portfolio featuring an interactive 3D skull with real-time color customization, a project grid, and `/world` — a Minecraft-style hub where you walk between arcade machines, each one showcasing a project (press `E` to inspect).
+
+## Stack
+
+- Next.js (App Router) + React + TypeScript
+- Three.js via @react-three/fiber, drei and postprocessing
+- Tailwind CSS

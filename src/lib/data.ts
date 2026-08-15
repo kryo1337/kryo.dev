@@ -5,6 +5,7 @@ export interface Project {
   image: string;
   link: string;
   isOpenSource: boolean;
+  wip?: boolean;
 }
 
 export const personalProjects: Project[] = [
@@ -18,19 +19,28 @@ export const personalProjects: Project[] = [
   },
   {
     title: 'pureReaction',
-    description: 'The ultimate web-based tool for measuring and training your reflexes with near-native speed and accuracy',
+    description: 'Minimal web-based tool for measuring reaction time',
     tags: ['Zig', 'WASM', 'JS', 'HTML', 'CSS'],
     image: '/images/purereaction.png',
-    link: 'https://pure-reaction.vercel.app/',
+    link: 'https://purereaction.kryo.dev/',
     isOpenSource: true,
   },
   {
-    title: 'GETRANK',
-    description: 'Fast Valorant player lookup via leaderboard rank or Riot ID',
-    tags: ['Bun', 'TS', 'Python', 'React', 'Tailwind CSS', 'Playwright', 'Redis', 'Docker'],
-    image: '/images/getrank.png',
-    link: 'https://getrank.vercel.app/',
+    title: 'valdog',
+    description: 'Windows tray app that detects your live VALORANT match and shows the full lobby roster in a web app',
+    tags: ['Go', 'Fyne', 'WebSocket', 'TS', 'React', 'PostgreSQL'],
+    image: '/images/valdog.png',
+    link: 'https://valdog.kryo.dev',
     isOpenSource: true,
+  },
+  {
+    title: 'letsgamba',
+    description: 'Real-time multiplayer betting platform with a 3D roulette table and Twitch integration',
+    tags: ['React', 'Three.js', 'TS', 'C#', 'SignalR', 'PostgreSQL', 'Docker'],
+    image: '/images/letsgamba.png',
+    link: 'https://letsgamba.tv',
+    isOpenSource: false,
+    wip: true,
   },
   {
     title: 'YTVOD Pipeline',
@@ -38,25 +48,6 @@ export const personalProjects: Project[] = [
     tags: ['Python', 'OpenCV', 'YouTube API', 'Twitch API', 'SOOP API', 'Telegram API', 'FFmpeg', 'yt-dlp'],
     image: '/images/ytvod.png',
     link: 'https://www.youtube.com/@ValoBengBeng',
-    isOpenSource: false,
-  },
-];
-
-export const wipProjects: Project[] = [
-  {
-    title: 'Valorant Discord Hub',
-    description: 'E2E Discord bot, with API and front. Faceit alike system for valorant with team selection, map bans, leaderboard, stats and more',
-    tags: ['Python', 'FastAPI', 'discord.py', 'React', 'Tailwind CSS', 'MongoDB', 'Docker', 'Kubernetes'],
-    image: '/images/shhh.png',
-    link: 'https://github.com/kryo1337/valodiscordhub',
-    isOpenSource: true,
-  },
-  {
-    title: 'Rewiring',
-    description: 'Mobile app that helps users truly improve in any aspect',
-    tags: ['Python', 'FastAPI', 'React Native', 'Expo', 'GraphQL', 'Tailwind CSS', 'PostgreSQL'],
-    image: '/images/shhh.png',
-    link: 'https://github.com/kryo1337',
     isOpenSource: false,
   },
 ];

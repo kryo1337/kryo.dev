@@ -29,8 +29,8 @@ html {
   --color-mauve-dark: var(--color-mauve-dark);
   --color-border-subtle: var(--border-subtle);
   
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+  --font-sans: var(--font-tui);
+  --font-mono: var(--font-tui);
 }
 
 @media (prefers-color-scheme: dark) {
@@ -41,7 +41,9 @@ html {
 }
 
 * {
-  font-family: var(--font-space), -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  font-family: var(--font-tui), "VT323", monospace;
+  font-variant-ligatures: none;
+  font-feature-settings: "liga" 0, "calt" 0;
 }
 
 body {
@@ -69,30 +71,52 @@ body {
   font-size: 0.8rem !important;
 }
 
-.font-space {
-  font-family: var(--font-space), -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif !important;
+.font-tui,
+.font-mono {
+  font-family: var(--font-tui), "VT323", monospace !important;
 }
 
-.font-mono {
-  font-family: "JetBrains Mono Nerd", "JetBrains Mono", monospace !important;
+@layer components {
+  .btn-tui {
+    @apply inline-block px-4 py-1 text-[20px] leading-tight border transition-colors duration-150 cursor-pointer;
+  }
+  .btn-tui-primary {
+    @apply bg-mauve border-mauve text-white hover:bg-transparent hover:text-mauve;
+  }
+  .btn-tui-secondary {
+    @apply bg-[#3a3a3a] border-[#3a3a3a] text-muted hover:bg-muted hover:text-background;
+  }
+  .link-tui {
+    @apply inline-block px-1 py-1.5 text-[20px] leading-tight text-muted transition-colors duration-150 hover:bg-mauve hover:text-background cursor-pointer;
+  }
+}
+
+.slider-tui {
+  @apply flex-1 h-0.5 bg-[#3a3a3a] appearance-none cursor-pointer;
+}
+.slider-tui::-webkit-slider-thumb {
+  @apply appearance-none w-3 h-3 rounded-none;
+}
+.slider-tui::-moz-range-thumb {
+  @apply w-3 h-3 rounded-none border-none;
 }
 
 .slider-red::-webkit-slider-thumb {
-  @apply bg-red-500 shadow-[0_0_10px_rgba(239,68,68,0.5)];
+  @apply bg-red-500;
 }
 .slider-green::-webkit-slider-thumb {
-  @apply bg-green-500 shadow-[0_0_10px_rgba(34,197,94,0.5)];
+  @apply bg-green-500;
 }
 .slider-blue::-webkit-slider-thumb {
-  @apply bg-blue-500 shadow-[0_0_10px_rgba(59,130,246,0.5)];
+  @apply bg-blue-500;
 }
 
 .slider-red::-moz-range-thumb {
-  @apply bg-red-500 border-none shadow-[0_0_10px_rgba(239,68,68,0.5)];
+  @apply bg-red-500;
 }
 .slider-green::-moz-range-thumb {
-  @apply bg-green-500 border-none shadow-[0_0_10px_rgba(34,197,94,0.5)];
+  @apply bg-green-500;
 }
 .slider-blue::-moz-range-thumb {
-  @apply bg-blue-500 border-none shadow-[0_0_10px_rgba(59,130,246,0.5)];
+  @apply bg-blue-500;
 }
