@@ -112,14 +112,20 @@ const PALETTE: BlockId[] = [
   'water',
 ];
 
+const BUILD_ENABLED = process.env.NODE_ENV === 'development';
+
 const CONTROLS: [string, string][] = [
   ['WASD', 'Move'],
   ['Space', 'Jump'],
   ['Mouse', 'Look around'],
   ['E', 'Inspect machine'],
-  ['B', 'Build mode'],
-  ['Scroll', 'Pick block'],
-  ['LMB / RMB', 'Break / Place'],
+  ...(BUILD_ENABLED
+    ? ([
+        ['B', 'Build mode'],
+        ['Scroll', 'Pick block'],
+        ['LMB / RMB', 'Break / Place'],
+      ] as [string, string][])
+    : []),
   ['Esc', 'Pause'],
 ];
 
@@ -185,10 +191,10 @@ export default function World() {
         controlsRef.current?.unlock();
       }
 
-      if (e.code === 'KeyB' && locked) {
+      if (e.code === 'KeyB' && locked && BUILD_ENABLED) {
         setBuildMode((b) => !b);
       }
-      if (e.code === 'KeyG' && locked && process.env.NODE_ENV === 'development') {
+      if (e.code === 'KeyG' && locked && BUILD_ENABLED) {
         const json = JSON.stringify(EDITS);
         const pos = `PLAYER ${JSON.stringify({
           x: +PLAYER_STATE.x.toFixed(2),
