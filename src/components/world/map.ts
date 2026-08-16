@@ -143,8 +143,9 @@ export interface MachineBox {
 }
 
 const MACHINE_HALF_WIDTH = 0.95;
-const MACHINE_BACK = -0.55;
-const MACHINE_FRONT = 0.61;
+export const MACHINE_FORWARD = 0.15;
+const MACHINE_BACK = -0.55 + MACHINE_FORWARD;
+const MACHINE_FRONT = 0.61 + MACHINE_FORWARD;
 const MACHINE_BASE_Y = 1;
 const MACHINE_TOP_Y = 3.5;
 const MACHINE_CELL_COVER = 0.25;
@@ -637,6 +638,7 @@ function buildWorld() {
     { x: 6, z: -10, rotationY: 0, projectIndex: 2 },
     { x: -10, z: 0, rotationY: Math.PI / 2, projectIndex: 3 },
     { x: 10, z: 0, rotationY: -Math.PI / 2, projectIndex: 4 },
+    { x: 0, z: 10, rotationY: Math.PI, projectIndex: 5 },
   ];
 
   const machineCells = new Set<string>();
@@ -657,7 +659,7 @@ function buildWorld() {
       const bz = alongX ? m.z : m.z + i;
       blocks.set(key(bx, 0, bz), 'planks');
       const fx = alongX ? bx : bx + (m.rotationY > 0 ? 1 : -1);
-      const fz = alongX ? bz + 1 : bz;
+      const fz = alongX ? bz + (m.rotationY === 0 ? 1 : -1) : bz;
       blocks.set(key(fx, 0, fz), 'planks');
     }
   }
@@ -919,7 +921,7 @@ const globalStore = globalThis as unknown as {
 
 export const WORLD = DEV ? (globalStore.__kryoWorld ??= buildWorld()) : buildWorld();
 
-export const SPAWN: [number, number, number] = [0.5, 1, -3.3];
+export const SPAWN: [number, number, number] = [0.5, 1, -3.8];
 export const SPAWN_YAW = Math.PI;
 
 export function isSolid(x: number, y: number, z: number): boolean {

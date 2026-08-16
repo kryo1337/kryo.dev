@@ -3,18 +3,19 @@ export interface Project {
   description: string;
   tags: string[];
   image: string;
-  link: string;
+  link?: string;
   isOpenSource: boolean;
   wip?: boolean;
+  isPrivate?: boolean;
 }
 
 export const personalProjects: Project[] = [
   {
-    title: 'Infinite Jumps',
+    title: 'infiniteJumps',
     description: 'High-performance web-based FPS movement game that recreates the mechanics of source engine',
     tags: ['TS', 'Three.js', 'HTML', 'CSS', 'Firebase'],
     image: '/images/infinitejumps.png',
-    link: 'https://infinite-jumps.vercel.app/',
+    link: 'https://infinitejumps.kryo.dev/',
     isOpenSource: true,
   },
   {
@@ -49,5 +50,13 @@ export const personalProjects: Project[] = [
     image: '/images/ytvod.png',
     link: 'https://www.youtube.com/@ValoBengBeng',
     isOpenSource: false,
+  },
+  {
+    title: 'tracker',
+    description: 'Life tracker: daily routine, gym workouts, supplements, habit limits, journal, subscriptions, body weight, with real-time sync and push reminders',
+    tags: ['C#', 'ASP.NET', 'EF Core', 'PostgreSQL', 'SignalR', 'Hangfire', 'React', 'TS', 'PWA', 'Docker'],
+    image: '/images/tracker.png',
+    isOpenSource: false,
+    isPrivate: true,
   },
 ];

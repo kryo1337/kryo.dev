@@ -33,6 +33,11 @@ export default function ProjectCard({
       <div className="flex flex-wrap items-start justify-between gap-x-3 gap-y-2">
         <h3 className={titleClassName}>{project.title}</h3>
         <div className="flex flex-wrap gap-1.5 pt-1">
+          {project.isPrivate && (
+            <span className="px-2 py-0.5 text-[20px] leading-tight bg-[#9d7cff]/10 text-[#9d7cff] border border-[#9d7cff]/20">
+              private
+            </span>
+          )}
           {project.wip && (
             <span className="px-2 py-0.5 text-[20px] leading-tight bg-amber-500/10 text-amber-400 border border-amber-500/20">
               in progress

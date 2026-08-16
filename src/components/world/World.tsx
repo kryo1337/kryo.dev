@@ -15,7 +15,7 @@ import {
 } from '@react-three/postprocessing';
 import { BoxGeometry, EdgesGeometry, Group, InstancedMesh, Matrix4, Mesh, MeshBasicMaterial, Object3D } from 'three';
 import { personalProjects } from '@/lib/data';
-import { BLOCK_DEFS, BlockId, EDITS, hash2, mapVersions, PLAYER_STATE, resetWorld, valueNoise, WORLD } from './map';
+import { BLOCK_DEFS, BlockId, EDITS, hash2, MACHINE_FORWARD, mapVersions, PLAYER_STATE, resetWorld, valueNoise, WORLD } from './map';
 import VoxelMap from './VoxelMap';
 import Decorations from './Decorations';
 import Lanterns from './Lanterns';
@@ -295,7 +295,7 @@ export default function World() {
             {WORLD.machines.map((m, i) => (
               <ArcadeMachine
                 key={i}
-                position={[m.x + 0.5, 1, m.z + 0.5]}
+                position={[m.x + 0.5 + Math.sin(m.rotationY) * MACHINE_FORWARD, 1, m.z + 0.5 + Math.cos(m.rotationY) * MACHINE_FORWARD]}
                 rotationY={m.rotationY}
                 project={personalProjects[m.projectIndex]}
                 highlighted={near === i}

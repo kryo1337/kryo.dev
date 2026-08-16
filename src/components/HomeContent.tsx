@@ -34,7 +34,7 @@ export default function HomeContent() {
       </div>
 
       <section className="w-full px-4 pt-20 pb-4 md:px-6 md:pt-20 md:pb-6">
-        <div className="relative h-[85vh] min-h-[600px] w-full md:w-[75%] mx-auto rounded-none overflow-hidden flex flex-col items-center justify-center bg-bg-elevated-2 border border-border-subtle">
+        <div className="relative h-[85vh] min-h-[600px] w-full md:w-[72%] mx-auto rounded-none overflow-hidden flex flex-col items-center justify-center bg-bg-elevated-2 border border-border-subtle">
 
           <div className="absolute inset-0 z-0">
             <Image
@@ -96,17 +96,21 @@ export default function HomeContent() {
             </a>
           </div>
           <div className={`grid grid-cols-1 md:grid-cols-2 gap-6 ${personalProjects.length >= 3 ? 'lg:grid-cols-3' : 'lg:grid-cols-2'}`}>
-            {personalProjects.map((project) => (
-              <a
-                key={project.title}
-                href={project.link}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="block h-full transition-[filter] duration-200 hover:brightness-110"
-              >
-                <ProjectCard project={project} className="h-full" />
-              </a>
-            ))}
+            {personalProjects.map((project) =>
+              project.link ? (
+                <a
+                  key={project.title}
+                  href={project.link}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="block h-full transition-[filter] duration-200 hover:brightness-110"
+                >
+                  <ProjectCard project={project} className="h-full" />
+                </a>
+              ) : (
+                <ProjectCard key={project.title} project={project} className="h-full" />
+              ),
+            )}
           </div>
         </div>
       </section>

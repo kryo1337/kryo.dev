@@ -2,15 +2,30 @@
 
 import { useEffect, useMemo } from 'react';
 import { useTexture } from '@react-three/drei';
-import { NearestFilter, SRGBColorSpace } from 'three';
+import { MeshStandardMaterial, NearestFilter, RepeatWrapping, SRGBColorSpace, Texture } from 'three';
 import { Project } from '@/lib/data';
 
 const BODY = '#1c1b22';
 const BODY_LIGHT = '#2a2933';
 
+const TILE_SIZE = 0.75;
+
+function tiledBoxMaterials(source: Texture, [w, h, d]: [number, number, number]) {
+  const faces: [number, number][] = [[d, h], [d, h], [w, d], [w, d], [w, h], [w, h]];
+  return faces.map(([fw, fh]) => {
+    const tex = source.clone();
+    tex.wrapS = RepeatWrapping;
+    tex.wrapT = RepeatWrapping;
+    tex.repeat.set(fw / TILE_SIZE, fh / TILE_SIZE);
+    tex.needsUpdate = true;
+    return new MeshStandardMaterial({ map: tex, roughness: 1 });
+  });
+}
+
 function marqueeColor(project: Project): string {
+  if (project.isPrivate) return '#9d7cff';
   if (project.wip) return '#eab308';
-  return project.isOpenSource ? '#22c55e' : '#e11d48';
+  return project.isOpenSource ? '#22c55e' : '#ff2a55';
 }
 
 export default function ArcadeMachine({
@@ -30,9 +45,10 @@ export default function ArcadeMachine({
     '/textures/wood.png',
   ]);
 
-  const { screenTex, sideTex, deckTex, screenSize } = useMemo(() => {
+  const { screenTex, sideMaterials, deckMaterials, screenSize } = useMemo(() => {
     const [screen, side, deck] = loaded.map((source) => source.clone());
     screen.colorSpace = SRGBColorSpace;
+    screen.anisotropy = 8;
     for (const tex of [side, deck]) {
       tex.magFilter = NearestFilter;
       tex.minFilter = NearestFilter;
@@ -40,20 +56,24 @@ export default function ArcadeMachine({
     }
     const image = screen.image as { width?: number; height?: number } | undefined;
     const aspect = image?.width && image?.height ? image.width / image.height : 1.6;
-    const width = Math.min(1.2, 0.75 * aspect);
+    const width = Math.min(1.34, 0.82 * aspect);
     return {
       screenTex: screen,
-      sideTex: side,
-      deckTex: deck,
+      sideMaterials: tiledBoxMaterials(side, [0.2, 2.2, 0.9]),
+      deckMaterials: tiledBoxMaterials(deck, [1.5, 0.14, 0.5]),
       screenSize: [width, width / aspect] as [number, number],
     };
   }, [loaded]);
 
   useEffect(
     () => () => {
-      for (const tex of [screenTex, sideTex, deckTex]) tex.dispose();
+      screenTex.dispose();
+      for (const mat of [...sideMaterials, ...deckMaterials]) {
+        mat.map?.dispose();
+        mat.dispose();
+      }
     },
-    [screenTex, sideTex, deckTex]
+    [screenTex, sideMaterials, deckMaterials]
   );
 
   return (
@@ -63,13 +83,11 @@ export default function ArcadeMachine({
         <meshStandardMaterial color={BODY} roughness={0.9} />
       </mesh>
 
-      <mesh position={[-0.85, 1.1, -0.1]} castShadow receiveShadow>
+      <mesh position={[-0.85, 1.1, -0.1]} material={sideMaterials} castShadow receiveShadow>
         <boxGeometry args={[0.2, 2.2, 0.9]} />
-        <meshStandardMaterial map={sideTex} roughness={1} />
       </mesh>
-      <mesh position={[0.85, 1.1, -0.1]} castShadow receiveShadow>
+      <mesh position={[0.85, 1.1, -0.1]} material={sideMaterials} castShadow receiveShadow>
         <boxGeometry args={[0.2, 2.2, 0.9]} />
-        <meshStandardMaterial map={sideTex} roughness={1} />
       </mesh>
 
       <mesh position={[0, 2.35, -0.05]} castShadow>
@@ -81,13 +99,13 @@ export default function ArcadeMachine({
         <meshStandardMaterial
           color={marqueeColor(project)}
           emissive={marqueeColor(project)}
-          emissiveIntensity={highlighted ? 3 : 1.6}
+          emissiveIntensity={highlighted ? 5 : 1.8}
           toneMapped={false}
         />
       </mesh>
 
       <mesh position={[0, 1.55, 0.26]} rotation={[-0.12, 0, 0]}>
-        <boxGeometry args={[1.34, 0.92, 0.06]} />
+        <boxGeometry args={[1.46, 1.0, 0.06]} />
         <meshStandardMaterial color="#0a0a0d" roughness={0.4} />
       </mesh>
       <mesh position={[0, 1.55, 0.3]} rotation={[-0.12, 0, 0]}>
@@ -102,9 +120,8 @@ export default function ArcadeMachine({
         />
       </mesh>
 
-      <mesh position={[0, 0.92, 0.35]} rotation={[-0.35, 0, 0]} castShadow>
+      <mesh position={[0, 0.92, 0.35]} rotation={[-0.35, 0, 0]} material={deckMaterials} castShadow>
         <boxGeometry args={[1.5, 0.14, 0.5]} />
-        <meshStandardMaterial map={deckTex} roughness={1} />
       </mesh>
       {[-0.35, 0, 0.35].map((x, i) => (
         <mesh key={i} position={[x, 1.02, 0.42]} rotation={[-0.35, 0, 0]}>
