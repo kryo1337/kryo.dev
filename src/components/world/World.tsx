@@ -13,7 +13,7 @@ import {
   SMAA,
   Vignette,
 } from '@react-three/postprocessing';
-import { BoxGeometry, EdgesGeometry, Group, InstancedMesh, Matrix4, Mesh, MeshBasicMaterial, Object3D } from 'three';
+import { BoxGeometry, Camera, EdgesGeometry, Group, InstancedMesh, Matrix4, Mesh, MeshBasicMaterial, Object3D, Quaternion } from 'three';
 import { personalProjects } from '@/lib/data';
 import { BLOCK_DEFS, BlockId, EDITS, hash2, MACHINE_FORWARD, mapVersions, PLAYER_STATE, resetWorld, valueNoise, WORLD } from './map';
 import VoxelMap from './VoxelMap';
@@ -25,7 +25,7 @@ import NameTag from './NameTag';
 import ProjectPanel from './ProjectPanel';
 import { disposeMeshes } from './dispose';
 
-type PointerLockControlsImpl = { lock: () => void; unlock: () => void; domElement?: HTMLElement };
+type PointerLockControlsImpl = { lock: () => void; unlock: () => void; domElement?: HTMLElement; camera: Camera };
 
 const KEY_MAP = [
   { name: 'forward', keys: ['KeyW', 'ArrowUp'] },
@@ -143,6 +143,8 @@ export default function World() {
   const [activeProject, setActiveProject] = useState<number | null>(null);
   const [resumeHint, setResumeHint] = useState(false);
   const lockChangeAt = useRef(0);
+  const savedQuat = useRef<Quaternion | null>(null);
+  const dropNextMove = useRef(false);
   const requestLock = useCallback(() => {
     const el = controlsRef.current?.domElement;
     if (!el || document.pointerLockElement === el) return;
@@ -155,19 +157,28 @@ export default function World() {
   }, []);
   const onLock = useCallback(() => {
     lockChangeAt.current = performance.now();
+    if (savedQuat.current) controlsRef.current?.camera.quaternion.copy(savedQuat.current);
+    dropNextMove.current = true;
     setLocked(true);
     setActiveProject(null);
     setResumeHint(false);
   }, []);
   const onUnlock = useCallback(() => {
     lockChangeAt.current = performance.now();
+    savedQuat.current = controlsRef.current?.camera.quaternion.clone() ?? null;
     setLocked(false);
   }, []);
 
   useEffect(() => {
     const filter = (e: MouseEvent) => {
       if (!document.pointerLockElement) return;
-      const recent = performance.now() - lockChangeAt.current < 150;
+      if (dropNextMove.current) {
+        dropNextMove.current = false;
+        lockChangeAt.current = performance.now();
+        e.stopImmediatePropagation();
+        return;
+      }
+      const recent = performance.now() - lockChangeAt.current < 300;
       if (recent && (Math.abs(e.movementX) > 250 || Math.abs(e.movementY) > 250)) e.stopImmediatePropagation();
     };
     window.addEventListener('mousemove', filter, true);

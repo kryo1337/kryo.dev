@@ -4,6 +4,7 @@ export interface Project {
   tags: string[];
   image: string;
   link?: string;
+  repo?: string;
   isOpenSource: boolean;
   wip?: boolean;
   isPrivate?: boolean;
@@ -16,6 +17,7 @@ export const personalProjects: Project[] = [
     tags: ['TS', 'Three.js', 'HTML', 'CSS', 'Firebase'],
     image: '/images/infinitejumps.png',
     link: 'https://infinitejumps.kryo.dev/',
+    repo: 'https://github.com/kryo1337/infinitejumps',
     isOpenSource: true,
   },
   {
@@ -24,6 +26,7 @@ export const personalProjects: Project[] = [
     tags: ['Zig', 'WASM', 'JS', 'HTML', 'CSS'],
     image: '/images/purereaction.png',
     link: 'https://purereaction.kryo.dev/',
+    repo: 'https://github.com/kryo1337/purereaction',
     isOpenSource: true,
   },
   {
@@ -32,6 +35,7 @@ export const personalProjects: Project[] = [
     tags: ['Go', 'Fyne', 'WebSocket', 'TS', 'React', 'PostgreSQL'],
     image: '/images/valdog.png',
     link: 'https://valdog.kryo.dev',
+    repo: 'https://github.com/kryo1337/valdog',
     isOpenSource: true,
   },
   {

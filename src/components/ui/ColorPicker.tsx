@@ -35,7 +35,7 @@ function adjustBrightness(r: number, g: number, b: number, factor: number) {
   return rgbToHex(newR, newG, newB);
 }
 
-export default function ColorPicker({ onColorChange }: { onColorChange?: (hex: string) => void }) {
+export default function ColorPicker() {
   const [isOpen, setIsOpen] = useState(false);
   const [rgb, setRgb] = useState(() => hexToRgb(getInitialColor()));
   const [hexInput, setHexInput] = useState(() => getInitialColor());
@@ -54,11 +54,7 @@ export default function ColorPicker({ onColorChange }: { onColorChange?: (hex: s
     document.documentElement.style.setProperty('--color-mauve', hex);
     document.documentElement.style.setProperty('--color-mauve-dim', dimHex);
     document.documentElement.style.setProperty('--color-mauve-dark', darkHex);
-
-    if (onColorChange) {
-      onColorChange(hex);
-    }
-  }, [onColorChange]);
+  }, []);
 
   /* eslint-disable react-hooks/exhaustive-deps */
   useEffect(() => {

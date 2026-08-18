@@ -1,29 +1,16 @@
 'use client';
 
-import { useState } from 'react';
-import Link from 'next/link';
 import Image from 'next/image';
 import ProjectCard from '@/components/ProjectCard';
+import ProjectActions from '@/components/ProjectActions';
 import { personalProjects } from '@/lib/data';
-import Scene from '@/components/3d/Scene';
 import ColorPicker from '@/components/ui/ColorPicker';
 
-const DEFAULT_COLOR = '#C80050';
-const STORAGE_KEY = 'kryo-accent-color';
-
-function getInitialColor() {
-  if (typeof window === 'undefined') return DEFAULT_COLOR;
-  const saved = localStorage.getItem(STORAGE_KEY);
-  return (saved && /^#[0-9A-F]{6}$/i.test(saved)) ? saved : DEFAULT_COLOR;
-}
-
 export default function HomeContent() {
-  const [skullColor, setSkullColor] = useState(() => getInitialColor());
-
   return (
     <main className="min-h-screen bg-background text-foreground selection:bg-mauve-dim/30 relative">
       <div className="fixed inset-x-0 top-0 z-50 flex items-start justify-between gap-3 px-4 py-3 md:px-6 md:py-4">
-        <ColorPicker onColorChange={(hex) => setSkullColor(hex)} />
+        <ColorPicker />
         <div className="flex flex-wrap justify-end gap-x-2 gap-y-1">
           <a href="https://x.com/kryoxd" target="_blank" rel="noopener noreferrer" className="link-tui">[x]</a>
           <a href="https://github.com/kryo1337" target="_blank" rel="noopener noreferrer" className="link-tui">[github]</a>
@@ -52,13 +39,7 @@ export default function HomeContent() {
             <div className="absolute bottom-0 left-0 w-full h-1/2 bg-gradient-to-t from-background to-transparent" />
           </div>
 
-          <div className="absolute inset-0 z-10 flex items-start justify-center pointer-events-none pt-8">
-            <div className="w-full h-[300px] pointer-events-auto relative" style={{ zIndex: 10 }}>
-              <Scene skullColor={skullColor} />
-            </div>
-          </div>
-
-          <div className="relative z-20 text-center space-y-6 px-4 mt-60">
+          <div className="relative z-20 text-center space-y-6 px-4">
             <div className="inline-block">
               <h1 className="text-5xl md:text-8xl tracking-tighter text-mauve pb-2 drop-shadow-none font-minecraft">
                 kryo
@@ -66,12 +47,13 @@ export default function HomeContent() {
             </div>
 
             <div className="pt-8 pointer-events-auto flex items-center justify-center gap-4">
-              <Link
-                href="#projects"
-                className="inline-flex items-center justify-center font-minecraft w-56 h-10 text-sm text-white bg-mauve-dark hover:bg-mauve border-2 border-black shadow-[inset_-2px_-4px_0_rgba(0,0,0,0.4),inset_2px_2px_0_rgba(255,255,255,0.35)] [text-shadow:2px_2px_0_rgba(0,0,0,0.5)] active:shadow-[inset_2px_4px_0_rgba(0,0,0,0.4)]"
+              <button
+                type="button"
+                onClick={() => document.getElementById('projects')?.scrollIntoView({ behavior: 'smooth' })}
+                className="cursor-pointer inline-flex items-center justify-center font-minecraft w-56 h-10 text-sm text-white bg-mauve-dark hover:bg-mauve border-2 border-black shadow-[inset_-2px_-4px_0_rgba(0,0,0,0.4),inset_2px_2px_0_rgba(255,255,255,0.35)] [text-shadow:2px_2px_0_rgba(0,0,0,0.5)] active:shadow-[inset_2px_4px_0_rgba(0,0,0,0.4)]"
               >
                 View Projects
-              </Link>
+              </button>
               <a
                 href="/world"
                 className="hidden md:inline-flex items-center justify-center font-minecraft w-56 h-10 text-sm text-white bg-[#727272] hover:bg-[#8a8a9e] border-2 border-black shadow-[inset_-2px_-4px_0_rgba(0,0,0,0.4),inset_2px_2px_0_rgba(255,255,255,0.35)] [text-shadow:2px_2px_0_rgba(0,0,0,0.5)] active:shadow-[inset_2px_4px_0_rgba(0,0,0,0.4)]"
@@ -96,21 +78,13 @@ export default function HomeContent() {
             </a>
           </div>
           <div className={`grid grid-cols-1 md:grid-cols-2 gap-6 ${personalProjects.length >= 3 ? 'lg:grid-cols-3' : 'lg:grid-cols-2'}`}>
-            {personalProjects.map((project) =>
-              project.link ? (
-                <a
-                  key={project.title}
-                  href={project.link}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="block h-full transition-[filter] duration-200 hover:brightness-110"
-                >
-                  <ProjectCard project={project} className="h-full" />
-                </a>
-              ) : (
-                <ProjectCard key={project.title} project={project} className="h-full" />
-              ),
-            )}
+            {personalProjects.map((project) => (
+              <ProjectCard key={project.title} project={project} className="h-full flex flex-col">
+                <div className="mt-auto">
+                  <ProjectActions project={project} />
+                </div>
+              </ProjectCard>
+            ))}
           </div>
         </div>
       </section>
