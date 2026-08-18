@@ -1,9 +1,9 @@
 'use client';
 
-import { Suspense, useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { memo, Suspense, useCallback, useEffect, useEffectEvent, useMemo, useRef, useState } from 'react';
 import Link from 'next/link';
 import { Canvas, useFrame } from '@react-three/fiber';
-import { KeyboardControls, PointerLockControls, Sky } from '@react-three/drei';
+import { KeyboardControls, PointerLockControls, Preload, Sky } from '@react-three/drei';
 import {
   EffectComposer,
   Bloom,
@@ -13,7 +13,7 @@ import {
   SMAA,
   Vignette,
 } from '@react-three/postprocessing';
-import { BoxGeometry, Camera, EdgesGeometry, Group, InstancedMesh, Matrix4, Mesh, MeshBasicMaterial, Object3D, Quaternion } from 'three';
+import { BoxGeometry, Camera, DirectionalLight, EdgesGeometry, Group, InstancedMesh, Matrix4, Mesh, MeshBasicMaterial, Object3D, Quaternion } from 'three';
 import { personalProjects } from '@/lib/data';
 import { BLOCK_DEFS, BlockId, EDITS, hash2, MACHINE_FORWARD, mapVersions, PLAYER_STATE, resetWorld, valueNoise, WORLD } from './map';
 import VoxelMap from './VoxelMap';
@@ -136,6 +136,34 @@ const LOW_END =
   typeof navigator !== 'undefined' &&
   ((navigator.hardwareConcurrency ?? 8) <= 4 || ((navigator as { deviceMemory?: number }).deviceMemory ?? 8) <= 4);
 
+const HIGHLIGHT_GEOMETRY = (() => {
+  const box = new BoxGeometry(1.02, 1.02, 1.02);
+  const edges = new EdgesGeometry(box);
+  box.dispose();
+  return edges;
+})();
+
+const Effects = memo(function Effects({ sun }: { sun: Mesh }) {
+  if (LOW_END) {
+    return (
+      <EffectComposer multisampling={0}>
+        <Bloom mipmapBlur luminanceThreshold={1} intensity={0.7} />
+        <Vignette offset={0.25} darkness={0.5} />
+      </EffectComposer>
+    );
+  }
+  return (
+    <EffectComposer>
+      <SMAA />
+      <GodRays sun={sun} samples={40} density={0.94} decay={0.92} weight={0.09} exposure={0.08} clampMax={1} blur />
+      <Bloom mipmapBlur luminanceThreshold={1} intensity={0.85} />
+      <HueSaturation saturation={0.18} />
+      <BrightnessContrast contrast={0.07} />
+      <Vignette offset={0.25} darkness={0.5} />
+    </EffectComposer>
+  );
+});
+
 export default function World() {
   const controlsRef = useRef<PointerLockControlsImpl | null>(null);
   const [locked, setLocked] = useState(false);
@@ -148,16 +176,28 @@ export default function World() {
   const requestLock = useCallback(() => {
     const el = controlsRef.current?.domElement;
     if (!el || document.pointerLockElement === el) return;
+    let p: Promise<void> | undefined;
     try {
-      const p = el.requestPointerLock() as unknown as Promise<void> | undefined;
-      p?.catch?.(() => setResumeHint(true));
+      p = el.requestPointerLock() as unknown as Promise<void> | undefined;
     } catch {
       setResumeHint(true);
+      return;
     }
+    p?.catch?.(() => setResumeHint(true));
   }, []);
   const onLock = useCallback(() => {
     lockChangeAt.current = performance.now();
-    if (savedQuat.current) controlsRef.current?.camera.quaternion.copy(savedQuat.current);
+    const camera = controlsRef.current?.camera;
+    const saved = savedQuat.current;
+    if (camera && saved) {
+      camera.quaternion.copy(saved);
+      let frames = 3;
+      const restore = () => {
+        camera.quaternion.copy(saved);
+        if (--frames > 0) requestAnimationFrame(restore);
+      };
+      requestAnimationFrame(restore);
+    }
     dropNextMove.current = true;
     setLocked(true);
     setActiveProject(null);
@@ -193,45 +233,68 @@ export default function World() {
   });
   const onMapChange = useCallback(() => setVersions(mapVersions()), []);
   const highlightRef = useRef<Object3D | null>(null);
-  const highlightEdges = useMemo(() => new EdgesGeometry(new BoxGeometry(1.02, 1.02, 1.02)), []);
+  const lightRef = useRef<DirectionalLight>(null);
+  const setSunRef = useCallback((m: Mesh | null) => setSun(m), []);
+  const onPickBlock = useCallback((id: BlockId) => {
+    const i = PALETTE.indexOf(id);
+    if (i >= 0) setSelected(i);
+  }, []);
 
   useEffect(() => {
-    const onKeyDown = (e: KeyboardEvent) => {
-      if (e.code === 'KeyE' && locked && near !== null && activeProject === null) {
-        setActiveProject(WORLD.machines[near].projectIndex);
-        controlsRef.current?.unlock();
-      }
+    const light = lightRef.current;
+    if (!light) return;
+    light.shadow.autoUpdate = false;
+    light.shadow.needsUpdate = true;
+  }, [versions]);
 
-      if (e.code === 'KeyB' && locked && BUILD_ENABLED) {
-        setBuildMode((b) => !b);
-      }
-      if (e.code === 'KeyG' && locked && BUILD_ENABLED) {
-        const json = JSON.stringify(EDITS);
-        const pos = `PLAYER ${JSON.stringify({
-          x: +PLAYER_STATE.x.toFixed(2),
-          y: +PLAYER_STATE.y.toFixed(2),
-          z: +PLAYER_STATE.z.toFixed(2),
-          yaw: +PLAYER_STATE.yaw.toFixed(2),
-        })}`;
-        console.log(pos);
-        console.log('WORLD_EDITS', json);
-        navigator.clipboard?.writeText(json).catch(() => {});
-      }
-    };
-    const onKeyUp = (e: KeyboardEvent) => {
-      if (e.code === 'Escape' && activeProject !== null) {
-        setActiveProject(null);
-        setResumeHint(true);
-        requestLock();
-      }
-    };
-    window.addEventListener('keydown', onKeyDown);
-    window.addEventListener('keyup', onKeyUp);
+  const relockPending = useRef(false);
+  const onKeyDown = useEffectEvent((e: KeyboardEvent) => {
+    if (e.code === 'Escape' && activeProject !== null) {
+      setActiveProject(null);
+      setResumeHint(true);
+      relockPending.current = true;
+    }
+    if (e.code === 'KeyE' && locked && near !== null && activeProject === null) {
+      setActiveProject(WORLD.machines[near].projectIndex);
+      controlsRef.current?.unlock();
+    }
+
+    if (e.code === 'KeyB' && locked && BUILD_ENABLED) {
+      setBuildMode((b) => !b);
+    }
+    if (e.code === 'KeyG' && locked && BUILD_ENABLED) {
+      const json = JSON.stringify(EDITS);
+      const pos = `PLAYER ${JSON.stringify({
+        x: +PLAYER_STATE.x.toFixed(2),
+        y: +PLAYER_STATE.y.toFixed(2),
+        z: +PLAYER_STATE.z.toFixed(2),
+        yaw: +PLAYER_STATE.yaw.toFixed(2),
+      })}`;
+      console.log(pos);
+      console.log('WORLD_EDITS', json);
+      navigator.clipboard?.writeText(json).catch(() => {});
+    }
+  });
+  const onKeyUp = useEffectEvent((e: KeyboardEvent) => {
+    if (e.code !== 'Escape') return;
+    if (relockPending.current) {
+      relockPending.current = false;
+      requestLock();
+      return;
+    }
+    if (!locked && activeProject === null && performance.now() - lockChangeAt.current > 300) requestLock();
+  });
+
+  useEffect(() => {
+    const keyDown = (e: KeyboardEvent) => onKeyDown(e);
+    const keyUp = (e: KeyboardEvent) => onKeyUp(e);
+    window.addEventListener('keydown', keyDown);
+    window.addEventListener('keyup', keyUp);
     return () => {
-      window.removeEventListener('keydown', onKeyDown);
-      window.removeEventListener('keyup', onKeyUp);
+      window.removeEventListener('keydown', keyDown);
+      window.removeEventListener('keyup', keyUp);
     };
-  }, [locked, near, activeProject, requestLock]);
+  }, []);
 
   useEffect(() => {
     const onWheel = (e: WheelEvent) => {
@@ -270,6 +333,7 @@ export default function World() {
             <hemisphereLight args={['#5d548f', '#3a2f2a', 0.5]} />
             <ambientLight color="#665884" intensity={0.28} />
             <directionalLight
+              ref={lightRef}
               position={[40, 20, -28]}
               color="#ff9a54"
               intensity={1.4}
@@ -281,11 +345,12 @@ export default function World() {
               shadow-camera-bottom={-55}
               shadow-camera-far={180}
               shadow-bias={-0.0004}
+              shadow-normalBias={0.03}
             />
             {GLOWSTONE_LIGHTS.map((p, i) => (
               <pointLight key={i} position={p} color="#ffd080" intensity={10} distance={12} decay={1.8} />
             ))}
-            <mesh ref={(m: Mesh | null) => setSun(m)} position={[185, 82, -130]}>
+            <mesh ref={setSunRef} position={[185, 82, -130]}>
               <sphereGeometry args={[6, 24, 24]} />
               <meshBasicMaterial color="#e8894a" fog={false} />
             </mesh>
@@ -298,7 +363,7 @@ export default function World() {
               ref={(o: Object3D | null) => {
                 highlightRef.current = o;
               }}
-              geometry={highlightEdges}
+              geometry={HIGHLIGHT_GEOMETRY}
               visible={false}
             >
               <lineBasicMaterial color="#ffffff" />
@@ -327,10 +392,7 @@ export default function World() {
               highlightRef={highlightRef}
               onMapChange={onMapChange}
               onNearMachine={setNear}
-              onPickBlock={(id) => {
-                const i = PALETTE.indexOf(id);
-                if (i >= 0) setSelected(i);
-              }}
+              onPickBlock={onPickBlock}
             />
             <PointerLockControls
               ref={(instance) => {
@@ -342,22 +404,8 @@ export default function World() {
               onUnlock={onUnlock}
             />
 
-            {sun && !LOW_END && (
-              <EffectComposer>
-                <SMAA />
-                <GodRays sun={sun} samples={40} density={0.94} decay={0.92} weight={0.09} exposure={0.08} clampMax={1} blur />
-                <Bloom mipmapBlur luminanceThreshold={1} intensity={0.85} />
-                <HueSaturation saturation={0.18} />
-                <BrightnessContrast contrast={0.07} />
-                <Vignette offset={0.25} darkness={0.5} />
-              </EffectComposer>
-            )}
-            {sun && LOW_END && (
-              <EffectComposer multisampling={0}>
-                <Bloom mipmapBlur luminanceThreshold={1} intensity={0.7} />
-                <Vignette offset={0.25} darkness={0.5} />
-              </EffectComposer>
-            )}
+            {sun && <Effects sun={sun} />}
+            <Preload all />
           </Suspense>
         </Canvas>
       </KeyboardControls>

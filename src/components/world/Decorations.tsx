@@ -8,6 +8,7 @@ import {
   Matrix4,
   MeshStandardMaterial,
   NearestFilter,
+  NearestMipmapLinearFilter,
   PlaneGeometry,
   Quaternion,
   SRGBColorSpace,
@@ -99,9 +100,11 @@ export default function Decorations({ version }: { version: number }) {
       loaded.map((source) => {
         const tex = source.clone();
         tex.magFilter = NearestFilter;
-        tex.minFilter = NearestFilter;
+        tex.minFilter = NearestMipmapLinearFilter;
+        tex.anisotropy = 4;
         tex.colorSpace = SRGBColorSpace;
-        tex.generateMipmaps = false;
+        tex.generateMipmaps = true;
+        tex.needsUpdate = true;
         return tex;
       }),
     [loaded]

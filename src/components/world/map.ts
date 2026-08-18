@@ -114,6 +114,11 @@ const MOUNTAIN_EDGE = 16;
 
 const key = (x: number, y: number, z: number) => `${x}|${y}|${z}`;
 
+const CELL_OFFSET = 128;
+const CELL_SPAN = 512;
+const cellKey = (x: number, y: number, z: number) =>
+  ((x + CELL_OFFSET) * CELL_SPAN + (y + CELL_OFFSET)) * CELL_SPAN + (z + CELL_OFFSET);
+
 export function hash2(x: number, z: number): number {
   const s = Math.sin(x * 127.1 + z * 311.7) * 43758.5453123;
   return s - Math.floor(s);
@@ -208,11 +213,11 @@ function terrainHeight(x: number, z: number): number {
 
 function buildWorld() {
   const blocks = new Map<string, BlockId>();
-  const solid = new Set<string>();
+  const solid = new Set<number>();
 
   const set = (x: number, y: number, z: number, id: BlockId) => {
     blocks.set(key(x, y, z), id);
-    if (id !== 'water') solid.add(key(x, y, z));
+    if (id !== 'water') solid.add(cellKey(x, y, z));
   };
   const has = (x: number, y: number, z: number) => blocks.has(key(x, y, z));
 
@@ -557,7 +562,7 @@ function buildWorld() {
     for (const [x, y, z, id] of USER_TERRAIN) {
       if (id === null) {
         blocks.delete(key(x, y, z));
-        solid.delete(key(x, y, z));
+        solid.delete(cellKey(x, y, z));
       } else {
         set(x, y, z, id);
       }
@@ -641,7 +646,7 @@ function buildWorld() {
     { x: 0, z: 10, rotationY: Math.PI, projectIndex: 5 },
   ];
 
-  const machineCells = new Set<string>();
+  const machineCells = new Set<number>();
   const machineBoxes: MachineBox[] = [];
   for (const m of machines) {
     const box = machineBox(m);
@@ -649,7 +654,7 @@ function buildWorld() {
     for (const cx of coveredCells(box.minX, box.maxX)) {
       for (const cy of coveredCells(box.minY, box.maxY)) {
         for (const cz of coveredCells(box.minZ, box.maxZ)) {
-          machineCells.add(key(cx, cy, cz));
+          machineCells.add(cellKey(cx, cy, cz));
         }
       }
     }
@@ -925,11 +930,11 @@ export const SPAWN: [number, number, number] = [0.5, 1, -3.8];
 export const SPAWN_YAW = Math.PI;
 
 export function isSolid(x: number, y: number, z: number): boolean {
-  return WORLD.solid.has(key(x, y, z));
+  return WORLD.solid.has(cellKey(x, y, z));
 }
 
 export function isMachineCell(x: number, y: number, z: number): boolean {
-  return WORLD.machineCells.has(key(x, y, z));
+  return WORLD.machineCells.has(cellKey(x, y, z));
 }
 
 export function intersectsMachine(
@@ -1023,7 +1028,7 @@ function applyCell(x: number, y: number, z: number, id: BlockId | undefined) {
   }
   if (id === undefined) {
     WORLD.blocks.delete(k);
-    WORLD.solid.delete(k);
+    WORLD.solid.delete(cellKey(x, y, z));
     WORLD.occluders.delete(k);
   } else {
     WORLD.blocks.set(k, id);
@@ -1031,9 +1036,9 @@ function applyCell(x: number, y: number, z: number, id: BlockId | undefined) {
     if (!keys) WORLD.byId.set(id, (keys = new Set<string>()));
     keys.add(k);
     if (id === 'water') {
-      WORLD.solid.delete(k);
+      WORLD.solid.delete(cellKey(x, y, z));
     } else {
-      WORLD.solid.add(k);
+      WORLD.solid.add(cellKey(x, y, z));
     }
     if (NON_OCCLUDING.has(id)) {
       WORLD.occluders.delete(k);
@@ -1080,7 +1085,7 @@ export function layerPositions(id: BlockId, version: number): [number, number, n
 
 export function placeBlock(x: number, y: number, z: number, id: BlockId): boolean {
   const k = key(x, y, z);
-  if (WORLD.machineCells.has(k) || WORLD.blocks.has(k)) return false;
+  if (WORLD.machineCells.has(cellKey(x, y, z)) || WORLD.blocks.has(k)) return false;
   history.push({ x, y, z, prev: undefined });
   applyCell(x, y, z, id);
   EDITS.push({ op: 'place', x, y, z, id });
@@ -1089,7 +1094,7 @@ export function placeBlock(x: number, y: number, z: number, id: BlockId): boolea
 
 export function removeBlock(x: number, y: number, z: number): boolean {
   const k = key(x, y, z);
-  if (WORLD.machineCells.has(k)) return false;
+  if (WORLD.machineCells.has(cellKey(x, y, z))) return false;
   const prev = WORLD.blocks.get(k);
   if (prev === undefined) return false;
   history.push({ x, y, z, prev });

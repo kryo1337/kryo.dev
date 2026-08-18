@@ -12,6 +12,7 @@ import {
   Matrix4,
   MeshStandardMaterial,
   NearestFilter,
+  NearestMipmapLinearFilter,
   RepeatWrapping,
   Shape,
   SRGBColorSpace,
@@ -59,6 +60,7 @@ function BlockLayer({
   const positions = layerPositions(id, version);
 
   const mesh = useMemo(() => {
+    if (positions.length === 0) return null;
     const def = BLOCK_DEFS[id];
     const shape = SHAPE_GEOMS[id];
     const geometry = shape ? shape() : new BoxGeometry(1, 1, 1);
@@ -102,9 +104,14 @@ function BlockLayer({
     return instanced;
   }, [id, positions, textures]);
 
-  useEffect(() => () => disposeMeshes([mesh]), [mesh]);
+  useEffect(
+    () => () => {
+      if (mesh) disposeMeshes([mesh]);
+    },
+    [mesh]
+  );
 
-  return <primitive object={mesh} />;
+  return mesh ? <primitive object={mesh} /> : null;
 }
 
 const CASCADE_TOP = 4.85;
@@ -171,9 +178,11 @@ export default function VoxelMap({ versions }: { versions: MapVersions }) {
     TEXTURE_PATHS.forEach((path, i) => {
       const tex = loaded[i].clone();
       tex.magFilter = NearestFilter;
-      tex.minFilter = NearestFilter;
+      tex.minFilter = NearestMipmapLinearFilter;
+      tex.anisotropy = 4;
       tex.colorSpace = SRGBColorSpace;
-      tex.generateMipmaps = false;
+      tex.generateMipmaps = true;
+      tex.needsUpdate = true;
       if (path === '/textures/water.png') {
         tex.wrapS = RepeatWrapping;
         tex.wrapT = RepeatWrapping;

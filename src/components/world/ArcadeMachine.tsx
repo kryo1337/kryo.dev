@@ -2,7 +2,14 @@
 
 import { useEffect, useMemo } from 'react';
 import { useTexture } from '@react-three/drei';
-import { MeshStandardMaterial, NearestFilter, RepeatWrapping, SRGBColorSpace, Texture } from 'three';
+import {
+  MeshStandardMaterial,
+  NearestFilter,
+  NearestMipmapLinearFilter,
+  RepeatWrapping,
+  SRGBColorSpace,
+  Texture,
+} from 'three';
 import { Project } from '@/lib/data';
 
 const BODY = '#1c1b22';
@@ -10,16 +17,28 @@ const BODY_LIGHT = '#2a2933';
 
 const TILE_SIZE = 0.75;
 
+const TILED_MATERIALS = new Map<string, MeshStandardMaterial[]>();
+
 function tiledBoxMaterials(source: Texture, [w, h, d]: [number, number, number]) {
+  const cacheKey = `${source.uuid}|${w}|${h}|${d}`;
+  const cached = TILED_MATERIALS.get(cacheKey);
+  if (cached) return cached;
   const faces: [number, number][] = [[d, h], [d, h], [w, d], [w, d], [w, h], [w, h]];
-  return faces.map(([fw, fh]) => {
+  const materials = faces.map(([fw, fh]) => {
     const tex = source.clone();
     tex.wrapS = RepeatWrapping;
     tex.wrapT = RepeatWrapping;
     tex.repeat.set(fw / TILE_SIZE, fh / TILE_SIZE);
+    tex.magFilter = NearestFilter;
+    tex.minFilter = NearestMipmapLinearFilter;
+    tex.anisotropy = 4;
+    tex.colorSpace = SRGBColorSpace;
+    tex.generateMipmaps = true;
     tex.needsUpdate = true;
     return new MeshStandardMaterial({ map: tex, roughness: 1 });
   });
+  TILED_MATERIALS.set(cacheKey, materials);
+  return materials;
 }
 
 function marqueeColor(project: Project): string {
@@ -46,14 +65,11 @@ export default function ArcadeMachine({
   ]);
 
   const { screenTex, sideMaterials, deckMaterials, screenSize } = useMemo(() => {
-    const [screen, side, deck] = loaded.map((source) => source.clone());
+    const [source, side, deck] = loaded;
+    const screen = source.clone();
     screen.colorSpace = SRGBColorSpace;
     screen.anisotropy = 8;
-    for (const tex of [side, deck]) {
-      tex.magFilter = NearestFilter;
-      tex.minFilter = NearestFilter;
-      tex.colorSpace = SRGBColorSpace;
-    }
+    screen.needsUpdate = true;
     const image = screen.image as { width?: number; height?: number } | undefined;
     const aspect = image?.width && image?.height ? image.width / image.height : 1.6;
     const width = Math.min(1.34, 0.82 * aspect);
@@ -65,16 +81,7 @@ export default function ArcadeMachine({
     };
   }, [loaded]);
 
-  useEffect(
-    () => () => {
-      screenTex.dispose();
-      for (const mat of [...sideMaterials, ...deckMaterials]) {
-        mat.map?.dispose();
-        mat.dispose();
-      }
-    },
-    [screenTex, sideMaterials, deckMaterials]
-  );
+  useEffect(() => () => screenTex.dispose(), [screenTex]);
 
   return (
     <group position={position} rotation={[0, rotationY, 0]}>

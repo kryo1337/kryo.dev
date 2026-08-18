@@ -9,6 +9,7 @@ import {
   Matrix4,
   MeshStandardMaterial,
   NearestFilter,
+  NearestMipmapLinearFilter,
   Quaternion,
   SRGBColorSpace,
   Vector3,
@@ -43,9 +44,11 @@ export default function Lanterns({ version }: { version: number }) {
   const glowTex = useMemo(() => {
     const tex = loaded.clone();
     tex.magFilter = NearestFilter;
-    tex.minFilter = NearestFilter;
+    tex.minFilter = NearestMipmapLinearFilter;
+    tex.anisotropy = 4;
     tex.colorSpace = SRGBColorSpace;
-    tex.generateMipmaps = false;
+    tex.generateMipmaps = true;
+    tex.needsUpdate = true;
     return tex;
   }, [loaded]);
 

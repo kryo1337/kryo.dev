@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useRef } from 'react';
+import { useEffect, useEffectEvent, useRef } from 'react';
 import { useFrame, useThree } from '@react-three/fiber';
 import { useKeyboardControls } from '@react-three/drei';
 import { Object3D, Vector3 } from 'three';
@@ -145,54 +145,56 @@ export default function Player({
     camera.rotation.set(0, SPAWN_YAW - Math.PI, 0);
   }, [camera]);
 
-  useEffect(() => {
-    const onMouseDown = (e: MouseEvent) => {
-      if (!document.pointerLockElement || !buildMode) return;
-      const t = target.current;
-      if (!t || t.machine) return;
-      if (e.button === 0) {
-        if (removeBlock(...t.hit)) onMapChange();
-      } else if (e.button === 1) {
-        e.preventDefault();
-        const id = blockAt(...t.hit);
-        if (id) {
-          const base = /^stairBrick/.test(id) ? 'stairBrick' : id === 'slabBrickTop' ? 'slabBrick' : id;
-          onPickBlock(base as BlockId);
-        }
-      } else if (e.button === 2) {
-        const [bx, by, bz] = t.prev;
-        const pos = position.current;
-        const overlapsPlayer =
-          bx < pos.x + HALF_WIDTH && bx + 1 > pos.x - HALF_WIDTH &&
-          bz < pos.z + HALF_WIDTH && bz + 1 > pos.z - HALF_WIDTH &&
-          by < pos.y + HEIGHT && by + 1 > pos.y;
-        if (blockAt(bx, by, bz) === undefined && !overlapsPlayer) {
-          let id = selectedBlock;
-          const topHalf = t.normalY === -1 ? true : t.normalY === 1 ? false : t.yFrac > 0.5;
-          if (id === 'slabBrick' && topHalf) {
-            id = 'slabBrickTop';
-          }
-          if (id === 'stairBrick') {
-            const d = lookDir.current;
-            const facing = Math.abs(d.x) > Math.abs(d.z)
-              ? d.x > 0 ? 'E' : 'W'
-              : d.z > 0 ? 'S' : 'N';
-            id = `stairBrick${facing}${topHalf ? 'I' : ''}` as typeof id;
-          }
-          if (placeBlock(bx, by, bz, id)) onMapChange();
-        }
+  const onMouseDown = useEffectEvent((e: MouseEvent) => {
+    if (!document.pointerLockElement || !buildMode) return;
+    const t = target.current;
+    if (!t || t.machine) return;
+    if (e.button === 0) {
+      if (removeBlock(...t.hit)) onMapChange();
+    } else if (e.button === 1) {
+      e.preventDefault();
+      const id = blockAt(...t.hit);
+      if (id) {
+        const base = /^stairBrick/.test(id) ? 'stairBrick' : id === 'slabBrickTop' ? 'slabBrick' : id;
+        onPickBlock(base as BlockId);
       }
-    };
+    } else if (e.button === 2) {
+      const [bx, by, bz] = t.prev;
+      const pos = position.current;
+      const overlapsPlayer =
+        bx < pos.x + HALF_WIDTH && bx + 1 > pos.x - HALF_WIDTH &&
+        bz < pos.z + HALF_WIDTH && bz + 1 > pos.z - HALF_WIDTH &&
+        by < pos.y + HEIGHT && by + 1 > pos.y;
+      if (blockAt(bx, by, bz) === undefined && !overlapsPlayer) {
+        let id = selectedBlock;
+        const topHalf = t.normalY === -1 ? true : t.normalY === 1 ? false : t.yFrac > 0.5;
+        if (id === 'slabBrick' && topHalf) {
+          id = 'slabBrickTop';
+        }
+        if (id === 'stairBrick') {
+          const d = lookDir.current;
+          const facing = Math.abs(d.x) > Math.abs(d.z)
+            ? d.x > 0 ? 'E' : 'W'
+            : d.z > 0 ? 'S' : 'N';
+          id = `stairBrick${facing}${topHalf ? 'I' : ''}` as typeof id;
+        }
+        if (placeBlock(bx, by, bz, id)) onMapChange();
+      }
+    }
+  });
+
+  useEffect(() => {
+    const mouseDown = (e: MouseEvent) => onMouseDown(e);
     const onAuxClick = (e: MouseEvent) => {
       if (document.pointerLockElement && e.button === 1) e.preventDefault();
     };
-    window.addEventListener('mousedown', onMouseDown);
+    window.addEventListener('mousedown', mouseDown);
     window.addEventListener('auxclick', onAuxClick);
     return () => {
-      window.removeEventListener('mousedown', onMouseDown);
+      window.removeEventListener('mousedown', mouseDown);
       window.removeEventListener('auxclick', onAuxClick);
     };
-  }, [buildMode, selectedBlock, onMapChange, onPickBlock]);
+  }, []);
 
   useFrame((_, delta) => {
     const dt = Math.min(delta, 0.05);
