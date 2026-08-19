@@ -3,7 +3,7 @@
 import { memo, Suspense, useCallback, useEffect, useEffectEvent, useMemo, useRef, useState } from 'react';
 import Link from 'next/link';
 import { Canvas, useFrame } from '@react-three/fiber';
-import { KeyboardControls, PointerLockControls, Preload, Sky } from '@react-three/drei';
+import { KeyboardControls, PointerLockControls, Preload, Sky, useProgress } from '@react-three/drei';
 import {
   EffectComposer,
   Bloom,
@@ -23,6 +23,7 @@ import Player from './Player';
 import ArcadeMachine from './ArcadeMachine';
 import NameTag from './NameTag';
 import ProjectPanel from './ProjectPanel';
+import WorldLoader from './WorldLoader';
 import { disposeMeshes } from './dispose';
 
 type PointerLockControlsImpl = { lock: () => void; unlock: () => void; domElement?: HTMLElement; camera: Camera };
@@ -166,6 +167,9 @@ const Effects = memo(function Effects({ sun }: { sun: Mesh }) {
 
 export default function World() {
   const controlsRef = useRef<PointerLockControlsImpl | null>(null);
+  const { progress, active } = useProgress();
+  const loadStarted = useRef(false);
+  const [assetsReady, setAssetsReady] = useState(false);
   const [locked, setLocked] = useState(false);
   const [near, setNear] = useState<number | null>(null);
   const [activeProject, setActiveProject] = useState<number | null>(null);
@@ -297,6 +301,14 @@ export default function World() {
   }, []);
 
   useEffect(() => {
+    if (active) {
+      loadStarted.current = true;
+      return;
+    }
+    if (loadStarted.current || progress === 100) setAssetsReady(true);
+  }, [active, progress]);
+
+  useEffect(() => {
     const onWheel = (e: WheelEvent) => {
       if (!locked || !buildMode) return;
       setSelected((s) => (s + (e.deltaY > 0 ? 1 : PALETTE.length - 1)) % PALETTE.length);
@@ -409,6 +421,13 @@ export default function World() {
           </Suspense>
         </Canvas>
       </KeyboardControls>
+
+      <div
+        aria-hidden={assetsReady}
+        className={`absolute inset-0 z-40 transition-opacity duration-500 ${assetsReady ? 'opacity-0 pointer-events-none' : 'opacity-100'}`}
+      >
+        <WorldLoader progress={progress} />
+      </div>
 
       {locked && (
         <>

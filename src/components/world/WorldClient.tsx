@@ -3,14 +3,11 @@
 import { useSyncExternalStore } from 'react';
 import Link from 'next/link';
 import dynamic from 'next/dynamic';
+import WorldLoader from './WorldLoader';
 
 const World = dynamic(() => import('./World'), {
   ssr: false,
-  loading: () => (
-    <div className="fixed inset-0 flex items-center justify-center bg-[#0e0d12]">
-      <span className="font-minecraft text-sm text-mauve animate-pulse">Loading world...</span>
-    </div>
-  ),
+  loading: () => <WorldLoader />,
 });
 
 let mediaQuery: MediaQueryList | null = null;
@@ -30,7 +27,7 @@ export default function WorldClient() {
   );
 
   if (isMobile === null) {
-    return <div className="fixed inset-0 bg-[#0e0d12]" />;
+    return <WorldLoader />;
   }
 
   if (isMobile) {
