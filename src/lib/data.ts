@@ -39,6 +39,14 @@ export const personalProjects: Project[] = [
     isOpenSource: true,
   },
   {
+    title: 'arektly',
+    description: 'Competitive Valorant platform with a matchmaking hub, ELO-based ranking, leaderboard, and a full tournament system with brackets, map veto, stats and more',
+    tags: ['C#', 'ASP.NET', 'EF Core', 'PostgreSQL', 'Redis', 'SignalR', 'React', 'TS', 'Docker'],
+    image: '/images/arektly.png',
+    isOpenSource: false,
+    wip: true,
+  },
+  {
     title: 'letsgamba',
     description: 'Real-time multiplayer betting platform with a 3D roulette table and Twitch integration',
     tags: ['React', 'Three.js', 'TS', 'C#', 'SignalR', 'PostgreSQL', 'Docker'],

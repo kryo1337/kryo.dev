@@ -641,9 +641,10 @@ function buildWorld() {
     { x: 0, z: -10, rotationY: 0, projectIndex: 1 },
     { x: -6, z: -10, rotationY: 0, projectIndex: 0 },
     { x: 6, z: -10, rotationY: 0, projectIndex: 2 },
-    { x: -10, z: 0, rotationY: Math.PI / 2, projectIndex: 3 },
-    { x: 10, z: 0, rotationY: -Math.PI / 2, projectIndex: 4 },
-    { x: 0, z: 10, rotationY: Math.PI, projectIndex: 5 },
+    { x: -10, z: -3, rotationY: Math.PI / 2, projectIndex: 3 },
+    { x: -10, z: 3, rotationY: Math.PI / 2, projectIndex: 4 },
+    { x: 10, z: 0, rotationY: -Math.PI / 2, projectIndex: 5 },
+    { x: 0, z: 10, rotationY: Math.PI, projectIndex: 6 },
   ];
 
   const machineCells = new Set<number>();
