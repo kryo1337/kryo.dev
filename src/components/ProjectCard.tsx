@@ -1,5 +1,5 @@
 import Image from 'next/image';
-import { MouseEventHandler, ReactNode } from 'react';
+import { KeyboardEvent, MouseEventHandler, ReactNode } from 'react';
 import { Project } from '@/lib/data';
 
 export default function ProjectCard({
@@ -7,20 +7,38 @@ export default function ProjectCard({
   titleClassName = 'text-[30px] leading-none text-mauve',
   className = '',
   onClick,
+  onImageClick,
   children,
 }: {
   project: Project;
   titleClassName?: string;
   className?: string;
   onClick?: MouseEventHandler<HTMLDivElement>;
+  onImageClick?: () => void;
   children?: ReactNode;
 }) {
+  const handleImageKeyDown = (e: KeyboardEvent<HTMLDivElement>) => {
+    if (e.code === 'Enter' || e.code === 'Space') {
+      e.preventDefault();
+      onImageClick?.();
+    }
+  };
+
   return (
     <div
       onClick={onClick}
       className={`bg-[#2a2933] border-4 border-black shadow-[inset_2px_2px_0_rgba(255,255,255,0.15),inset_-2px_-2px_0_rgba(0,0,0,0.5)] p-6 space-y-5 ${className}`}
     >
-      <div className="relative w-full aspect-[16/9] overflow-hidden border-2 border-black bg-black">
+      <div
+        onClick={onImageClick && ((e) => { e.stopPropagation(); onImageClick(); })}
+        onKeyDown={onImageClick && handleImageKeyDown}
+        role={onImageClick ? 'button' : undefined}
+        tabIndex={onImageClick ? 0 : undefined}
+        aria-label={onImageClick ? `zoom ${project.title}` : undefined}
+        className={`relative w-full aspect-[16/9] overflow-hidden border-2 border-black bg-black ${
+          onImageClick ? 'cursor-zoom-in transition hover:brightness-110' : ''
+        }`}
+      >
         <Image
           src={project.image}
           alt={project.title}

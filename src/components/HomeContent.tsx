@@ -1,12 +1,16 @@
 "use client";
 
+import { useState } from "react";
 import Image from "next/image";
 import ProjectCard from "@/components/ProjectCard";
+import ImageLightbox from "@/components/ImageLightbox";
 import ProjectActions from "@/components/ProjectActions";
 import { personalProjects } from "@/lib/data";
 import ColorPicker from "@/components/ui/ColorPicker";
 
 export default function HomeContent() {
+  const [lightbox, setLightbox] = useState<{ src: string; alt: string } | null>(null);
+
   return (
     <main className="min-h-screen bg-background text-foreground selection:bg-mauve-dim/30 relative">
       <div className="fixed inset-x-0 top-0 z-50 flex items-start justify-between gap-3 px-4 py-3 md:px-6 md:py-4">
@@ -126,6 +130,7 @@ export default function HomeContent() {
                 key={project.title}
                 project={project}
                 className="h-full flex flex-col"
+                onImageClick={() => setLightbox({ src: project.image, alt: project.title })}
               >
                 <div className="mt-auto">
                   <ProjectActions project={project} />
@@ -139,6 +144,8 @@ export default function HomeContent() {
       <footer className="py-12 text-center text-muted text-[20px]">
         <p>&copy; 2026 kryo.dev</p>
       </footer>
+
+      <ImageLightbox image={lightbox} onClose={() => setLightbox(null)} />
     </main>
   );
 }
