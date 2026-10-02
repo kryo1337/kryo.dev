@@ -12,13 +12,12 @@ export interface Project {
 
 export const personalProjects: Project[] = [
   {
-    title: 'infiniteJumps',
-    description: 'High-performance web-based FPS movement game that recreates the mechanics of source engine',
-    tags: ['TS', 'Three.js', 'HTML', 'CSS', 'Firebase'],
-    image: '/images/infinitejumps.png',
-    link: 'https://infinitejumps.kryo.dev/',
-    repo: 'https://github.com/kryo1337/infinitejumps',
-    isOpenSource: true,
+    title: 'preaim',
+    description: 'Browser training platform with scenarios on Valorant-inspired maps and movement and shooting modeled on the game. The best way to practice prefiring, crosshair placement and aim, with leaderboards',
+    tags: ['Rust', 'WASM', 'WebGPU', 'axum', 'PostgreSQL', 'JS', 'Docker'],
+    image: '/images/preaim.png',
+    link: 'https://preaim.kryo.dev',
+    isOpenSource: false,
   },
   {
     title: 'pureReaction',
@@ -36,6 +35,15 @@ export const personalProjects: Project[] = [
     image: '/images/valdog.png',
     link: 'https://valdog.kryo.dev',
     repo: 'https://github.com/kryo1337/valdog',
+    isOpenSource: true,
+  },
+  {
+    title: 'infiniteJumps',
+    description: 'High-performance web-based FPS movement game that recreates the mechanics of source engine',
+    tags: ['TS', 'Three.js', 'HTML', 'CSS', 'Firebase'],
+    image: '/images/infinitejumps.png',
+    link: 'https://infinitejumps.kryo.dev/',
+    repo: 'https://github.com/kryo1337/infinitejumps',
     isOpenSource: true,
   },
   {
