@@ -10,6 +10,7 @@ import ColorPicker from "@/components/ui/ColorPicker";
 
 export default function HomeContent() {
   const [lightbox, setLightbox] = useState<{ src: string; alt: string } | null>(null);
+  const [contactFlash, setContactFlash] = useState(false);
 
   return (
     <main className="min-h-screen bg-background text-foreground selection:bg-mauve-dim/30 relative">
@@ -40,22 +41,19 @@ export default function HomeContent() {
           >
             [yt]
           </a>
-          <a
-            href="https://www.twitch.tv/kryoxd"
-            target="_blank"
-            rel="noopener noreferrer"
+          <button
+            type="button"
+            onClick={() => {
+              document
+                .getElementById("contact")
+                ?.scrollIntoView({ behavior: "smooth" });
+              setContactFlash(true);
+              window.setTimeout(() => setContactFlash(false), 1600);
+            }}
             className="link-tui"
           >
-            [twitch]
-          </a>
-          <a
-            href="https://buymeacoffee.com/kryo"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="link-tui"
-          >
-            [coffee]
-          </a>
+            [contact]
+          </button>
         </div>
       </div>
 
@@ -141,8 +139,16 @@ export default function HomeContent() {
         </div>
       </section>
 
-      <footer className="py-12 text-center text-muted text-[20px]">
-        <p>&copy; 2026 kryo.dev</p>
+      <footer id="contact" className="py-12 text-center text-muted text-[20px]">
+        <p>
+          &copy; 2026 kryo.dev ·{" "}
+          <a
+            href="mailto:contact@kryo.dev"
+            className={`transition-colors duration-300 hover:text-mauve ${contactFlash ? "bg-mauve text-background" : ""}`}
+          >
+            contact@kryo.dev
+          </a>
+        </p>
       </footer>
 
       <ImageLightbox image={lightbox} onClose={() => setLightbox(null)} />
