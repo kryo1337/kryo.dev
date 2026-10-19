@@ -16,7 +16,7 @@ export const personalProjects: Project[] = [
     description: 'Browser training platform with scenarios on Valorant-inspired maps and movement and shooting modeled on the game. The best way to practice prefiring, crosshair placement and aim, with leaderboards',
     tags: ['Rust', 'WASM', 'WebGPU', 'axum', 'PostgreSQL', 'JS', 'Docker'],
     image: '/images/preaim.png',
-    link: 'https://preaim.kryo.dev',
+    link: 'https://preaim.win',
     isOpenSource: false,
   },
   {
